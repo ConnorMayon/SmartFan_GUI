@@ -8,7 +8,7 @@ def main():
     window.resizable(False, False)
     frm = ttk.Frame(window, padding=10)
     frm.grid()
-    ttk.Label(frm, height=5, width=10).grid(column=0, row=0)
+    ttk.Label(frm, text="Hello World!").grid(column=0, row=0)
     button = Button(window, text="Set min temp pref", fg="white", bg="#3f91cc", font=('15'), height=5, command=window.destroy).grid(column=2, row=1)
     window.mainloop()
 
