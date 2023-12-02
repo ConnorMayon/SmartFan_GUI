@@ -1,6 +1,13 @@
 from tkinter import *
 from tkinter import ttk
+from subprocess import run
+import threading
+import mouse
+import time
+import threading
 
+global start_time
+global display_on
 global min_temp
 global max_temp
 global min_temp_str
@@ -12,6 +19,8 @@ global sched_hour_str
 global sched_min_tens_str
 global sched_min_ones_str
 
+start_time = time.time()
+display_on = True
 min_temp = 70
 max_temp = 90
 sched_hour = 12
@@ -92,6 +101,10 @@ def main():
     button_sched_min_ones_inc.place(x=585, y=150)
     button_sched_min_ones_dec.place(x=585, y=250)
 
+    t1 = threading.Thread(target=sleep_timer)
+    t2 = threading.Thread(target=check_click)
+    t1.start()
+    t2.start()
     window.mainloop()
 
 
@@ -189,6 +202,26 @@ def dec_sched_min_ones():
     else:
         sched_min_ones = 9
     sched_min_ones_str.set(str(sched_min_ones))
+
+def sleep_timer():
+    global start_time
+    global display_on
+
+    while True:
+        time.sleep(1)
+        if time.time() - start_time >= 60 and display_on:
+            run('vcgencmd display_power 0', shell=True)
+            display_on = False
+
+
+def check_click():
+    global start_time
+    global display_on
+    while True:
+        if mouse.is_pressed("left"):
+            start_time = time.time()
+            run('vcgencmd display_power 1', shell=True)
+            display_on = True
 
 
 # Press the green button in the gutter to run the script.
