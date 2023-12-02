@@ -37,15 +37,15 @@ def main():
     min_label = ttk.Label(text="Min temp")
     max_label = ttk.Label(text="Max temp")
 
-    button_min_temp_inc.place(x=100, y=100)
-    button_min_temp_dec.place(x=100, y=200)
-    button_max_temp_inc.place(x=225, y=100)
-    button_max_temp_dec.place(x=225, y=200)
-    min_temp_disp.place(x=115, y=155)
-    max_temp_disp.place(x=240, y=155)
-    temp_range_label.place(x=75, y=50)
-    min_label.place(x=98, y=255)
-    max_label.place(x=223, y=255)
+    button_min_temp_inc.place(x=150, y=150)
+    button_min_temp_dec.place(x=150, y=250)
+    button_max_temp_inc.place(x=275, y=150)
+    button_max_temp_dec.place(x=275, y=250)
+    min_temp_disp.place(x=165, y=205)
+    max_temp_disp.place(x=290, y=205)
+    temp_range_label.place(x=125, y=100)
+    min_label.place(x=148, y=305)
+    max_label.place(x=273, y=305)
 
     #main_screen(window)
 
@@ -67,26 +67,34 @@ def temp_set_screen(window, button_list):
 
 def inc_min_temp():
     global min_temp
+    global max_temp
     global min_temp_str
-    min_temp += 1
+    if min_temp < max_temp:
+        min_temp += 1
     min_temp_str.set(str(min_temp))
 
 def dec_min_temp():
     global min_temp
+    global max_temp
     global min_temp_str
-    min_temp -= 1
+    if min_temp > 40:
+        min_temp -= 1
     min_temp_str.set(str(min_temp))
 
 def inc_max_temp():
+    global min_temp
     global max_temp
     global max_temp_str
-    max_temp += 1
+    if max_temp < 100:
+        max_temp += 1
     max_temp_str.set(str(max_temp))
 
 def dec_max_temp():
+    global min_temp
     global max_temp
     global max_temp_str
-    max_temp -= 1
+    if max_temp > min_temp:
+        max_temp -= 1
     max_temp_str.set(str(max_temp))
 
 # Press the green button in the gutter to run the script.
