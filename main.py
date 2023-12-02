@@ -1,3 +1,4 @@
+import subprocess
 from tkinter import *
 from tkinter import ttk
 from subprocess import run
@@ -209,8 +210,9 @@ def sleep_timer():
 
     while True:
         time.sleep(1)
-        if time.time() - start_time >= 60 and display_on:
-            run('vcgencmd display_power 0', shell=True)
+        if time.time() - start_time >= 15 and display_on:
+            #run('vcgencmd display_power 0', shell=True)
+            subprocess.run("./backlight_off.sh", shell=True)
             display_on = False
 
 
@@ -220,7 +222,8 @@ def check_click():
     while True:
         if mouse.is_pressed("left"):
             start_time = time.time()
-            run('vcgencmd display_power 1', shell=True)
+            #run('vcgencmd display_power 1', shell=True)
+            run("./backlight_off.sh", shell=True)
             display_on = True
 
 
