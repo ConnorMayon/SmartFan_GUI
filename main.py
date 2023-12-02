@@ -405,7 +405,7 @@ def save_time():
     time_str = sched_hour_str.get() + ':' + sched_min_tens_str.get() + sched_min_ones_str.get()
 
     sched_list.append(time_str)
-    sched_label_list.append(ttk.Label(text=time_str, font='Helvetica 15 bold'))
+    sched_label_list.append(ttk.Label(text=time_str, background="#FFF", font='Helvetica 15 bold'))
 
 
 def place_sched_label_list():
