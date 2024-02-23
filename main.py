@@ -6,6 +6,7 @@ import threading
 import mouse
 import time
 import threading
+from evdev import InputDevice, ecodes, categorize
 
 global page
 global start_time
@@ -69,6 +70,7 @@ def main():
 
     window = Tk()
     window.title('SMARTFAN GUI')
+    #window.attributes("-fullscreen", True)
     window.geometry("800x480")  # Matches res of pi display
     window.configure(background="#FFF")
     window.resizable(False, False)
@@ -197,7 +199,7 @@ def sleep_timer(window):
 
     while True:
         time.sleep(1)
-        if time.time() - start_time >= 15 and display_on:
+        if time.time() - start_time >= 40 and display_on:
             hide_save_time_button()
             hide_switch_page_button()
             if page == 0:
