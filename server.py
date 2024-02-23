@@ -1,32 +1,33 @@
-import RPi.GPIO as GPIO
-import socket
+from http.server import SimpleHTTPRequestHandler, HTTPServer
+from urllib.parse import urlparse, parse_qs
 
-def main():
-    HOST = ''                 # Symbolic name meaning all available interfaces
-    PORT = 50007              # Arbitrary non-privileged port
-    pin = 4
+class CustomHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        parsed_path = urlparse(self.path)
+        query_params = parse_qs(parsed_path.query)
 
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setwarnings(False)
+        if parsed_path.path == '/log':
+            if 'message' in query_params:
+                message = query_params['message'][0]
+                print("Button Pressed:", message)
+                self.send_response(200)
+                self.send_header('Content-type', 'text/plain')
+                self.end_headers()
+                self.wfile.write(b"Logged to terminal: " + message.encode())
+            else:
+                self.send_response(400)
+                self.send_header('Content-type', 'text/plain')
+                self.end_headers()
+                self.wfile.write(b"Bad request: Missing 'message' parameter")
+        else:
+            super().do_GET()
 
-    GPIO.setup(pin, GPIO.OUT)
+def run():
+    PORT = 8000
+    server_address = ('', PORT)
+    httpd = HTTPServer(server_address, CustomHandler)
+    print('Server running at port', PORT)
+    httpd.serve_forever()
 
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((HOST, PORT))
-        s.listen(1)
-        conn, addr = s.accept()
-        with conn:
-            print('Connected by', addr)
-            while True:
-                data = conn.recv(1024)
-                if not data: break
-                if data == b'on':
-                    GPIO.output(pin, GPIO.HIGH)
-                else:
-                    GPIO.output(pin, GPIO.LOW)
-                conn.sendall(data)
-
-
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    run()
