@@ -4,6 +4,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.clock import Clock
 from kivy.uix.label import Label
 from kivy.core.window import Window
+import socket
 
 class SchedulingPage(GridLayout):
     def __init__(self, switch_home_callback, **kwargs):
@@ -222,7 +223,14 @@ class SmartFanApp(App):
         app.root.add_widget(app.build())
 
     def fan_power(self, instance):
-        pass
+        HOST = '192.168.1.161'    # The remote host
+        PORT = 50007              # The same port as used by the server
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((HOST, PORT))
+            output = bytes("on", 'utf-8');
+            s.sendall(output)
+            data = s.recv(1024)
+        print('Received', repr(data))
    
 
 if __name__ == '__main__':
