@@ -227,7 +227,7 @@ class SmartFanApp(App):
         PORT = 50007              # The same port as used by the server
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((HOST, PORT))
-            output = bytes("on", 'utf-8');
+            output = bytes("power", 'utf-8');
             s.sendall(output)
             data = s.recv(1024)
         print('Received', repr(data))
