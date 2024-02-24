@@ -46,7 +46,17 @@ class SmartFanApp(App):
         self.min = 0
         self.sched_list = []
         self.sched_label_list = []
+        
+        # Conn
+        HOST = '192.168.1.161'    # The remote host
+        PORT = 50007              # The same port as used by the server
+        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.connect((HOST, PORT))
 
+        print("\n\n\n\nType:")
+        print(type(self.server_socket))
+        print("\n\n\n\n")
+        
         layout = GridLayout(cols=2, rows=6, row_force_default=True, col_force_default= True, col_default_width=350, row_default_height=50)
 
         title_lable_layout = GridLayout(cols=2, col_force_default=True, col_default_width=305, row_force_default=True, row_default_height=40)
@@ -139,6 +149,9 @@ class SmartFanApp(App):
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
         layout.add_widget(button_row_layout)
+        
+        #output = bytes("power", 'utf-8');
+        #server_socket.sendall(output)
 
         return layout
 
@@ -223,14 +236,8 @@ class SmartFanApp(App):
         app.root.add_widget(app.build())
 
     def fan_power(self, instance):
-        HOST = '192.168.1.161'    # The remote host
-        PORT = 50007              # The same port as used by the server
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT))
-            output = bytes("power", 'utf-8');
-            s.sendall(output)
-            data = s.recv(1024)
-        print('Received', repr(data))
+        output = bytes("power", 'utf-8');
+        self.server_socket.sendall(output)
    
 
 if __name__ == '__main__':

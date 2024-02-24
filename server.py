@@ -20,7 +20,8 @@ def main():
             print('Connected by', addr)
             while True:
                 data = conn.recv(1024)
-                if not data: break
+                print(data)
+                #if not data: break
                 if data == b'power':
                     if fan_state:
                         fan_state = False
@@ -30,7 +31,6 @@ def main():
                         GPIO.output(pin, GPIO.HIGH)
                 else:
                     GPIO.output(pin, GPIO.LOW)
-                conn.sendall(data)
 
 
 
