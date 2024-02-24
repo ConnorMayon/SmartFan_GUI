@@ -1,5 +1,7 @@
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
+import asyncio
+import websockets
 
 class CustomHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
@@ -27,7 +29,21 @@ def run():
     server_address = ('', PORT)
     httpd = HTTPServer(server_address, CustomHandler)
     print('Server running at port', PORT)
-    httpd.serve_forever()
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        httpd.server_close()
+        print('Server stopped.')
+
+
+    async def handle_websocket(websocket, path):
+        async for message in websocket:
+            print(f"Received message: {message}")
+
+    start_server = websockets.serve(handle_websocket, "10.3.62.240", 8000)
+
+    asyncio.get_event_loop().run_until_complete(start_server)
+    asyncio.get_event_loop().run_forever()
 
 if __name__ == '__main__':
     run()

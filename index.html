@@ -77,13 +77,13 @@
             fetch('/log?message=' + message);
         }
 
-        function decreaseAndLog(elementId, message) {
+    function decreaseAndLog(elementId, message) {
             var value = parseInt(document.getElementById(elementId).innerText);
             if (value > 0) {
                 document.getElementById(elementId).innerText = value - 1;
                 fetch('/log?message=' + message);
             }
-        }
+    }
 
         function saveTime() {
          var hours = parseInt(document.getElementById('hoursValue').innerText);
@@ -101,7 +101,6 @@
          window.location.href = "schedule.html";
         }
 
-
         function switchPage() {
             window.location.href = "schedule.html";
         }
@@ -109,6 +108,7 @@
         function fanPower() {
             
         }
+
     </script>
 </body>
 
