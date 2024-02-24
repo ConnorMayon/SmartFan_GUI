@@ -4,15 +4,19 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.clock import Clock
 from kivy.uix.label import Label
 from kivy.core.window import Window
+from kivy.network.urlrequest import UrlRequest
+import urllib.parse
+import urllib.request
 
 class SchedulingPage(GridLayout):
-    def __init__(self, switch_home_callback, **kwargs):
+    def __init__(self, switch_home_callback, sched_list, **kwargs):
         super().__init__(**kwargs)
         self.cols = 5
         self.rows = 10
         self.col_force_default=True
         self.col_default_width=90
-        self.saved_times=[]
+        self.sched_list=sched_list
+        self.message=""
         self.add_widget(Label())
         self.add_widget(Label())
         self.add_widget(Label())
@@ -21,11 +25,28 @@ class SchedulingPage(GridLayout):
         self.add_widget(Label())
         home_btn=Button(text='Home', background_color= [0.075, 0.71, 0.918, 1], on_press=switch_home_callback)
         self.add_widget(home_btn)
+        if len(self.sched_list) != 0:
+            for item in sched_list:
+                label = Label(text=item)
+                self.add_widget(label)
+            self.send_message("savedtime", self.message)
+        
+    def send_message(self,  change_type, value):
+        if len(self.sched_list) != 0:
+            value = self.sched_list[-1]
+        # Base URL of the server
+        url = 'http://10.3.62.240:8000/log'
 
-    def switch_home(self, instance):
-        app = App.get_running_app()
-        app.root.clear_widgets()
-        app.root.add_widget(app.build())
+        # Construct the query string
+        query_params = urllib.parse.urlencode({'message': f'({change_type}) ({value})'})
+
+        # Combine the base URL and the query string
+        full_url = f'{url}?{query_params}'
+
+        # Send the request
+        with urllib.request.urlopen(full_url) as response:
+            response_text = response.read().decode('utf-8')
+            print(response_text)
 
 
 class SmartFanApp(App):
@@ -38,9 +59,9 @@ class SmartFanApp(App):
     def build(self):
         self.page = 0
         self.display_on = True
-        self.min_temp = 70
-        self.max_temp = 90
-        self.hour = 12
+        self.min_temp = 65
+        self.max_temp = 85
+        self.hour = 5
         self.ten = 0
         self.min = 0
         self.sched_list = []
@@ -117,7 +138,7 @@ class SmartFanApp(App):
 
         layout.add_widget(time_layout)
 
-        button_row_layout=GridLayout(cols=3, rows=1, row_force_default=True, row_default_height=40, padding=[25, 0])
+        button_row_layout=GridLayout(cols=3, rows=2, row_force_default=True, row_default_height=40, padding=[25, 0])
 
         save_time_button = Button(text='Save Time', background_color= [0.075, 0.71, 0.918, 1], on_press=self.save_time)
 
@@ -144,18 +165,22 @@ class SmartFanApp(App):
     def on_min_temp_dec_press(self, instance):
         self.min_temp -= 1
         self.update_temp_labels()
+        self.send_message('mindec', self.min_temp)
 
     def on_min_temp_inc_press(self, instance):
         self.min_temp += 1
         self.update_temp_labels()
+        self.send_message('mininc', self.min_temp)
 
     def on_max_temp_dec_press(self, instance):
         self.max_temp -= 1
         self.update_temp_labels()
+        self.send_message('maxdec', self.max_temp)
 
     def on_max_temp_inc_press(self, instance):
         self.max_temp += 1
         self.update_temp_labels()
+        self.send_message('maxinc', self.max_temp)
 
     def update_temp_labels(self):
         if self.min_temp_label:
@@ -175,29 +200,35 @@ class SmartFanApp(App):
         if self.hour > 1:
             self.hour -= 1
             self.update_time_labels()
+            self.send_message('hourdec', self.hour)
 
     def hour_inc_press(self, instance):
         if self.hour < 24:
             self.hour += 1
             self.update_time_labels()
+            self.send_message('hourinc', self.hour)
 
     def ten_dec_press(self, instance):
         if self.ten > 0:
             self.ten -= 1
             self.update_time_labels()
+            self.send_message('tendec', self.ten)
 
     def ten_inc_press(self, instance):
         self.ten += 1
         self.update_time_labels()
+        self.send_message('teninc', self.ten)
 
     def min_dec_press(self, instance):
         if self.min > 0:
             self.min -= 1
             self.update_time_labels()
+            self.send_message('mintdec', self.min)
 
     def min_inc_press(self, instance):
         self.min += 1
         self.update_time_labels()
+        self.send_message('mintdec', self.min)
 
     def sleep_timer(self, dt):
         if self.display_on:
@@ -206,15 +237,15 @@ class SmartFanApp(App):
 
     def save_time(self, instance):
         # Create a label with the formatted time
-        time_label = Label(text=f"{self.hour:02}:{self.ten}{self.min}", color=[0, 0, 0, 1])
+        time_value=f"{self.hour:02}:{self.ten}{self.min}"
+        self.sched_list.append(time_value)
         # Add the label to the scheduling page
         self.switch_page(instance)
-        self.sched_label_list.append(time_label)
-        self.root.children[0].add_widget(time_label)
+        self.root.children[0].add_widget(Label(text=time_value, color=[0, 0, 0, 1]))
 
     def switch_page(self, instance):
         self.root.clear_widgets()
-        self.root.add_widget(SchedulingPage(switch_home_callback=self.switch_home))
+        self.root.add_widget(SchedulingPage(sched_list=self.sched_list, switch_home_callback=self.switch_home))
 
     def switch_home(self, instance):
         app = App.get_running_app()
@@ -224,6 +255,20 @@ class SmartFanApp(App):
     def fan_power(self, instance):
         pass
    
+    def send_message(self,  change_type, value):
+        # Base URL of the server
+        url = 'http://10.3.62.240:8000'
+
+        # Construct the query string
+        query_params = urllib.parse.urlencode({'message': f'({change_type}) ({value})'})
+
+        # Combine the base URL and the query string
+        full_url = f'{url}?{query_params}'
+
+        # Send the request
+        with urllib.request.urlopen(full_url) as response:
+            response_text = response.read().decode('utf-8')
+            #print(response_text)
 
 if __name__ == '__main__':
     SmartFanApp().run()
