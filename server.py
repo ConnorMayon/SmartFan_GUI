@@ -1,28 +1,92 @@
-from http.server import SimpleHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
-import asyncio
-import websockets
+import urllib
+import urllib.request
+import json
 
-class CustomHandler(SimpleHTTPRequestHandler):
+class CustomHandler(BaseHTTPRequestHandler):
+    kivyData = {}
+    #variables that are updated and sent in POST so web server can send to KIVY
+    temperatures = {
+        'minTempValue': 65,
+        'maxTempValue': 85
+    }
+    time_values = {
+        'hoursValue': 5,
+        'tenMinutesValue': 0,
+        'minutesValue': 0
+    }
+
+    def _set_headers(self, content_type='text/plain', response_type=200):
+        self.send_response(response_type)
+        self.send_header('Content-type', content_type)
+        self.end_headers()
+
     def do_GET(self):
-        parsed_path = urlparse(self.path)
-        query_params = parse_qs(parsed_path.query)
-
-        if parsed_path.path == '/log':
-            if 'message' in query_params:
-                message = query_params['message'][0]
-                print("Button Pressed:", message)
-                self.send_response(200)
-                self.send_header('Content-type', 'text/plain')
-                self.end_headers()
-                self.wfile.write(b"Logged to terminal: " + message.encode())
-            else:
-                self.send_response(400)
-                self.send_header('Content-type', 'text/plain')
-                self.end_headers()
-                self.wfile.write(b"Bad request: Missing 'message' parameter")
+        #display main page
+        if self.path == '/':
+            self._set_headers(content_type='text/html')
+            with open('index.html', 'rb') as f:
+                html_content = f.read()
+            self.wfile.write(html_content)
+        #not working down to next comment
+        #something like this needed for switch page on web app
+        elif self.path == '/switch':
+            self.send_response(301)
+            self.send_header('Location', 'schedule.html')
+            self.end_headers() 
+            #end   
+        #send kivy data to web app
+        elif self.path == '/log':
+            self._set_headers(content_type='application/json')
+            print("KivyData:", self.kivyData)
+            if CustomHandler.kivyData:
+               jsonstring=json.dumps(CustomHandler.kivyData)
+               self.wfile.write(jsonstring.encode('utf-8'))
+            else: self.wfile.write(b'{}')
+        #send web data to kivy app
+        elif self.path == '/data':
+            self._set_headers(content_type='application/json')
+            webData={**CustomHandler.temperatures, **CustomHandler.time_values}
+            print("WebData:", webData)
+            if CustomHandler.kivyData:
+               json_data=json.dumps(webData)
+               self.wfile.write(json_data.encode('utf-8'))
         else:
-            super().do_GET()
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(b'Not Found')
+
+    def do_POST(self):
+        #receive Kivy Data
+        if self.path == '/log':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length).decode('utf-8')
+            parsed_data = urllib.parse.parse_qs(post_data)
+            BtnData=parsed_data.get('buttonType')[0]
+            valueData=parsed_data.get('value')[0]
+            CustomHandler.kivyData=({"buttonType": BtnData, "value":valueData})
+            self._set_headers()
+            self.wfile.write(b'Data received successfully')
+        else:
+            self.send_error(404, 'File Not Found: %s' % self.path)
+
+        #receive Web data
+        if self.path == '/update_values':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length).decode('utf-8')
+            parsed_data = json.loads(post_data)
+            CustomHandler.temperatures['minTempValue'] = parsed_data['minTempValue']
+            CustomHandler.temperatures['maxTempValue'] = parsed_data['maxTempValue']
+            CustomHandler.time_values['hoursValue'] = parsed_data['hoursValue']
+            CustomHandler.time_values['tenMinutesValue'] = parsed_data['tenMinutesValue']
+            CustomHandler.time_values['minutesValue'] = parsed_data['minutesValue']
+            print(CustomHandler.temperatures)
+            print(CustomHandler.time_values)
+            self._set_headers()
+            self.wfile.write(b'Values updated successfully')
+        else:
+            self.send_error(404, 'File Not Found: %s' % self.path)
 
 def run():
     PORT = 8000
@@ -34,16 +98,6 @@ def run():
     except KeyboardInterrupt:
         httpd.server_close()
         print('Server stopped.')
-
-
-    async def handle_websocket(websocket, path):
-        async for message in websocket:
-            print(f"Received message: {message}")
-
-    start_server = websockets.serve(handle_websocket, "10.3.62.240", 8000)
-
-    asyncio.get_event_loop().run_until_complete(start_server)
-    asyncio.get_event_loop().run_forever()
 
 if __name__ == '__main__':
     run()
