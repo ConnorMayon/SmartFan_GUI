@@ -7,6 +7,7 @@ from kivy.core.window import Window
 from kivy.network.urlrequest import UrlRequest
 import urllib.parse
 import urllib.request
+import json
 
 class SchedulingPage(GridLayout):
     def __init__(self, switch_home_callback, sched_list, **kwargs):
@@ -30,24 +31,6 @@ class SchedulingPage(GridLayout):
                 label = Label(text=item)
                 self.add_widget(label)
             self.send_message("savedtime", self.message)
-        
-    def send_message(self,  change_type, value):
-        if len(self.sched_list) != 0:
-            value = self.sched_list[-1]
-        # Base URL of the server
-        url = 'http://10.3.62.240:8000/log'
-
-        # Construct the query string
-        query_params = urllib.parse.urlencode({'message': f'({change_type}) ({value})'})
-
-        # Combine the base URL and the query string
-        full_url = f'{url}?{query_params}'
-
-        # Send the request
-        with urllib.request.urlopen(full_url) as response:
-            response_text = response.read().decode('utf-8')
-            print(response_text)
-
 
 class SmartFanApp(App):
     Window.clearcolor = (1, 1, 1, 1)
@@ -161,6 +144,36 @@ class SmartFanApp(App):
         layout.add_widget(button_row_layout)
 
         return layout
+    
+    #this is the attempt to update the kivy app with web data
+    #not fully fleshed out due to persisting errors
+    #make_request is meant to use on_success and on_failure as callback
+    #functions in the self.request line
+    #this should be pretty easy once the data is passed in correctly
+    #probably looking something like
+    #self.min_temp = data.minTempValue
+    #and that will be done for each of the values being changed
+    # def on_success(self, req, result):
+    #     try:
+    #         data = json.loads(result)
+    #         # Process the data as needed
+    #         print("Received data:", data)
+    #     except json.JSONDecodeError as e:
+    #         print("Failed to decode JSON:", e)
+    #         print("FAILED")
+
+    # def on_failure(self, req, result):
+    #      # Handle the failure
+    #     print("Request failed")
+
+    # def make_request(self):
+    #     # Make a GET request
+    #     url = 'http://10.3.62.240:8000/data'
+    #     self.request = UrlRequest(url, on_success=self.on_success, on_failure=self.on_failure)
+
+
+     # Schedule the request to be made every 5 seconds
+    # Clock.schedule_interval(make_request, 5)
 
     def on_min_temp_dec_press(self, instance):
         self.min_temp -= 1
@@ -230,23 +243,28 @@ class SmartFanApp(App):
         self.update_time_labels()
         self.send_message('mintdec', self.min)
 
+    #not implemented until integrated with web app
     def sleep_timer(self, dt):
         if self.display_on:
             # Check if it's time to turn off the display
             pass
-
+    
+    #needs update after changes
     def save_time(self, instance):
         # Create a label with the formatted time
         time_value=f"{self.hour:02}:{self.ten}{self.min}"
         self.sched_list.append(time_value)
+        self.send_message('saveTime', time_value)
         # Add the label to the scheduling page
         self.switch_page(instance)
         self.root.children[0].add_widget(Label(text=time_value, color=[0, 0, 0, 1]))
 
+    #needs update after changes
     def switch_page(self, instance):
         self.root.clear_widgets()
         self.root.add_widget(SchedulingPage(sched_list=self.sched_list, switch_home_callback=self.switch_home))
 
+    #needs update after changes
     def switch_home(self, instance):
         app = App.get_running_app()
         app.root.clear_widgets()
@@ -257,18 +275,18 @@ class SmartFanApp(App):
    
     def send_message(self,  change_type, value):
         # Base URL of the server
-        url = 'http://10.3.62.240:8000'
+        url = 'http://10.3.62.240:8000/log'
 
         # Construct the query string
-        query_params = urllib.parse.urlencode({'message': f'({change_type}) ({value})'})
+        query_params = urllib.parse.urlencode({'buttonType': change_type, 'value': value}).encode('utf-8')
 
-        # Combine the base URL and the query string
-        full_url = f'{url}?{query_params}'
+        req=urllib.request.Request(url, data=query_params)
 
         # Send the request
-        with urllib.request.urlopen(full_url) as response:
-            response_text = response.read().decode('utf-8')
-            #print(response_text)
+        with urllib.request.urlopen(req) as response:
+            response = response.read().decode('utf-8')
+
+    
 
 if __name__ == '__main__':
     SmartFanApp().run()
