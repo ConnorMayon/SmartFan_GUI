@@ -3,6 +3,7 @@ from urllib.parse import urlparse, parse_qs
 import urllib
 import urllib.request
 import json
+import os
 
 class CustomHandler(BaseHTTPRequestHandler):
     kivyData = {}
@@ -29,6 +30,12 @@ class CustomHandler(BaseHTTPRequestHandler):
             with open('index.html', 'rb') as f:
                 html_content = f.read()
             self.wfile.write(html_content)
+        if self.path == '/styles.css':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/css')
+            self.end_headers()
+            with open(os.path.join(os.getcwd(), 'styles.css'), 'rb') as file:
+                self.wfile.write(file.read())
         #not working down to next comment
         #something like this needed for switch page on web app
         elif self.path == '/switch':
@@ -63,9 +70,13 @@ class CustomHandler(BaseHTTPRequestHandler):
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length).decode('utf-8')
             parsed_data = urllib.parse.parse_qs(post_data)
-            BtnData=parsed_data.get('buttonType')[0]
-            valueData=parsed_data.get('value')[0]
-            CustomHandler.kivyData=({"buttonType": BtnData, "value":valueData})
+            minTemp=parsed_data.get('min_temp')[0]
+            maxTemp=parsed_data.get('max_temp')[0]
+            hourVal=parsed_data.get('hour')[0]
+            tenVal=parsed_data.get('ten')[0]
+            minVal=parsed_data.get('minute')[0]
+            CustomHandler.kivyData=({"minTemp": minTemp, "maxTemp": maxTemp, "hourVal": hourVal, "tenVal": tenVal, "minVal": minVal})
+            print(CustomHandler.kivyData)
             self._set_headers()
             self.wfile.write(b'Data received successfully')
         else:

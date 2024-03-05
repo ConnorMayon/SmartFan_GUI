@@ -69,6 +69,7 @@
         <button onclick="saveTime()">Save Time</button>
         <button onclick="switchPage()">Switch Page</button>
         <button onclick="fanPower()">Fan ON/OFF</button>
+        <button onclick="fetchData()">Update</button>
     </div>
 
     <script>
@@ -107,7 +108,7 @@
         //not working after updates
         //this is an attempted fix after updates
         function switchPage() {
-        fetch('/switch')
+            fetch('/switch')
             .then(response => {
              if (response.ok) {
                 window.location.href = "schedule.html";
@@ -125,26 +126,45 @@
         function fetchData() {
             fetch('/log')
                 .then(response => response.json())
-                .then(data => updateContent(data))
+                .then(data => {
+                    if (data.length !== 0) {
+                     updateContent(data);
+                    }
+                })
                 .catch(error => console.error('Error fetching data:', error));
         }
         //updates values in web app according to data from kivy
         function updateContent(data) {
-            let btn = data.buttonType;
-            let value = data.value;
+            if (data && Object.keys(data).length > 0) {
+                let minTemp = data.minTemp;
+                let maxTemp = data.maxTemp;
+                let hourVal = data.hourVal;
+                let tenVal = data.tenVal;
+                let minVal = data.minVal;
 
-         if (btn == 'mindec' || btn == 'mininc') {
-            document.getElementById('minTempValue').innerText = value;
-         } else if (btn == 'maxinc' || btn == 'maxdec') {
-            document.getElementById('maxTempValue').innerText = value;
-         } else if (btn == 'hourinc' || btn == 'hourdec') {
-            document.getElementById('hoursValue').innerText = value;
-         } else if (btn == 'teninc' || btn == 'tendec') {
-            document.getElementById('tenMinutesValue').innerText = value;
-         } else if (btn == 'mintinc' || btn == 'mintdec') {
-            document.getElementById('minutesValue').innerText = value;
-         }
+                if (minTemp !== undefined) {
+                    document.getElementById('minTempValue').innerText = minTemp;
+                }
+
+                if (maxTemp !== undefined) {
+                    document.getElementById('maxTempValue').innerText = maxTemp;
+                }
+
+                if (hourVal !== undefined) {
+                    document.getElementById('hoursValue').innerText = hourVal;
+                }
+
+                if (tenVal !== undefined) {
+                    document.getElementById('tenMinutesValue').innerText = tenVal;
+                }
+
+                if (minVal !== undefined) {
+                    document.getElementById('minutesValue').innerText = minVal;
+                }
+            }
         }
+
+
         //sends values to web server from web app
         function updateValues() {
             var minTempValue = parseInt(document.getElementById('minTempValue').innerText);
@@ -175,12 +195,6 @@
         })
         .catch(error => console.error('Error updating values:', error));
     }
-
-        // Fetch data initially when the page loads
-        fetchData();
-
-        // Fetch data every 5 seconds
-        setInterval(fetchData, 1000);
 
     </script>
 </body>
