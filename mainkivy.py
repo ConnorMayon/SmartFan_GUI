@@ -4,10 +4,26 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.clock import Clock
 from kivy.uix.label import Label
 from kivy.core.window import Window
+#from kivy.core.window import Widget
 from kivy.network.urlrequest import UrlRequest
 import urllib.parse
 import urllib.request
+from functools import partial
+import socket
+import os
 import json
+
+# global display_on
+
+# class Touch(Widget):
+#     def on_touch_down(self, touch):
+#         global display_on
+#         if display_on:
+#             display_on = False
+#             os.popen('bash backlight_off.sh')
+#         else:
+#             display_on = True
+#             os.popen('bash backlight_on.sh')
 
 class SchedulingPage(GridLayout):
     def __init__(self, switch_home_callback, sched_list, **kwargs):
@@ -30,7 +46,7 @@ class SchedulingPage(GridLayout):
             for item in sched_list:
                 label = Label(text=item)
                 self.add_widget(label)
-            self.send_message("savedtime", self.message)
+            #self.send_message("savedtime", self.message)
 
 class SmartFanApp(App):
     Window.clearcolor = (1, 1, 1, 1)
@@ -49,6 +65,15 @@ class SmartFanApp(App):
         self.min = 0
         self.sched_list = []
         self.sched_label_list = []
+
+        # global display_on
+        # display_on = True
+        
+        # # Conn
+        # HOST = '192.168.1.161'    # The remote host
+        # PORT = 50007              # The same port as used by the server
+        # #self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # #self.server_socket.connect((HOST, PORT))
 
         layout = GridLayout(cols=2, rows=6, row_force_default=True, col_force_default= True, col_default_width=350, row_default_height=50)
 
@@ -135,6 +160,10 @@ class SmartFanApp(App):
 
         button_row_layout.add_widget(fan_power_button)
 
+        update_button = Button(text='Update', background_color= [0.075, 0.71, 0.918, 1], on_press=self.make_request)
+
+        button_row_layout.add_widget(update_button)
+
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
@@ -145,55 +174,54 @@ class SmartFanApp(App):
 
         return layout
     
-    #this is the attempt to update the kivy app with web data
-    #not fully fleshed out due to persisting errors
-    #make_request is meant to use on_success and on_failure as callback
-    #functions in the self.request line
-    #this should be pretty easy once the data is passed in correctly
-    #probably looking something like
-    #self.min_temp = data.minTempValue
-    #and that will be done for each of the values being changed
-    # def on_success(self, req, result):
-    #     try:
-    #         data = json.loads(result)
-    #         # Process the data as needed
-    #         print("Received data:", data)
-    #     except json.JSONDecodeError as e:
-    #         print("Failed to decode JSON:", e)
-    #         print("FAILED")
+        #output = bytes("power", 'utf-8');
+        #server_socket.sendall(output)
 
-    # def on_failure(self, req, result):
-    #      # Handle the failure
-    #     print("Request failed")
+        #return Touch()
+    
+    def make_request(self, instance):
+        # Make a GET request
+        url = 'http://10.3.62.239:8000/data'
+        self.request = UrlRequest(url, on_success=self.on_success, on_failure=self.on_failure)
 
-    # def make_request(self):
-    #     # Make a GET request
-    #     url = 'http://10.3.62.240:8000/data'
-    #     self.request = UrlRequest(url, on_success=self.on_success, on_failure=self.on_failure)
+    def on_success(self, request, result):
+        print("Received data:", result)
+        self.web_update_temp(result)
+        self.web_update_time(result)
 
+    def on_failure(self, request, error):
+        print("Request failed:", error)
 
-     # Schedule the request to be made every 5 seconds
-    # Clock.schedule_interval(make_request, 5)
+    def web_update_temp(self, results):
+        self.min_temp = results.get('minTempValue')
+        self.max_temp = results.get('maxTempValue')
+        self.update_temp_labels()
+
+    def web_update_time(self, results):
+        self.hour = results.get('hoursValue')
+        self.ten = results.get('tenMinutesValue')
+        self.min = results.get('minutesValue')
+        self.update_time_labels()
 
     def on_min_temp_dec_press(self, instance):
         self.min_temp -= 1
         self.update_temp_labels()
-        self.send_message('mindec', self.min_temp)
+        self.send_message()
 
     def on_min_temp_inc_press(self, instance):
         self.min_temp += 1
         self.update_temp_labels()
-        self.send_message('mininc', self.min_temp)
+        self.send_message()
 
     def on_max_temp_dec_press(self, instance):
         self.max_temp -= 1
         self.update_temp_labels()
-        self.send_message('maxdec', self.max_temp)
+        self.send_message()
 
     def on_max_temp_inc_press(self, instance):
         self.max_temp += 1
         self.update_temp_labels()
-        self.send_message('maxinc', self.max_temp)
+        self.send_message()
 
     def update_temp_labels(self):
         if self.min_temp_label:
@@ -213,35 +241,35 @@ class SmartFanApp(App):
         if self.hour > 1:
             self.hour -= 1
             self.update_time_labels()
-            self.send_message('hourdec', self.hour)
+            self.send_message()
 
     def hour_inc_press(self, instance):
         if self.hour < 24:
             self.hour += 1
             self.update_time_labels()
-            self.send_message('hourinc', self.hour)
+            self.send_message()
 
     def ten_dec_press(self, instance):
         if self.ten > 0:
             self.ten -= 1
             self.update_time_labels()
-            self.send_message('tendec', self.ten)
+            self.send_message()
 
     def ten_inc_press(self, instance):
         self.ten += 1
         self.update_time_labels()
-        self.send_message('teninc', self.ten)
+        self.send_message()
 
     def min_dec_press(self, instance):
         if self.min > 0:
             self.min -= 1
             self.update_time_labels()
-            self.send_message('mintdec', self.min)
+            self.send_message()
 
     def min_inc_press(self, instance):
         self.min += 1
         self.update_time_labels()
-        self.send_message('mintdec', self.min)
+        self.send_message()
 
     #not implemented until integrated with web app
     def sleep_timer(self, dt):
@@ -254,7 +282,7 @@ class SmartFanApp(App):
         # Create a label with the formatted time
         time_value=f"{self.hour:02}:{self.ten}{self.min}"
         self.sched_list.append(time_value)
-        self.send_message('saveTime', time_value)
+        #self.send_message('saveTime', time_value)
         # Add the label to the scheduling page
         self.switch_page(instance)
         self.root.children[0].add_widget(Label(text=time_value, color=[0, 0, 0, 1]))
@@ -272,19 +300,28 @@ class SmartFanApp(App):
 
     def fan_power(self, instance):
         pass
+        #output = bytes("power", 'utf-8')
+        #self.server_socket.sendall(output)
    
-    def send_message(self,  change_type, value):
+    def send_message(self):
         # Base URL of the server
-        url = 'http://10.3.62.240:8000/log'
+        url = 'http://10.3.62.239:8000/log'
 
         # Construct the query string
-        query_params = urllib.parse.urlencode({'buttonType': change_type, 'value': value}).encode('utf-8')
+        query_params = urllib.parse.urlencode({
+        'min_temp': self.min_temp,
+        'max_temp': self.max_temp,
+        'hour': self.hour,
+        'ten': self.ten,
+        'minute': self.min
+        }).encode('utf-8')
 
-        req=urllib.request.Request(url, data=query_params)
+        req = urllib.request.Request(url, data=query_params)
 
         # Send the request
         with urllib.request.urlopen(req) as response:
             response = response.read().decode('utf-8')
+
 
     
 
