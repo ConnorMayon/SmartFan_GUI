@@ -5,8 +5,6 @@ from kivy.clock import Clock
 from kivy.uix.label import Label
 from kivy.core.window import Window
 from kivy.uix.widget import Widget
-from kivy.input import MotionEvent
-from kivy.uix.screenmanager import ScreenManager
 import socket
 import os
 import threading
@@ -19,9 +17,9 @@ class WakeScreen(Widget):
         global start_time
         global display_on
         start_time = time.time()
-        display_on = True
-        os.popen('bash backlight_on.sh')
-
+            display_on = True
+            os.popen('bash backlight_on.sh')
+            
 
 class SchedulingPage(GridLayout):
     def __init__(self, switch_home_callback, **kwargs):
@@ -169,7 +167,6 @@ class SmartFanApp(App):
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
-
         layout.add_widget(button_row_layout)
         layout.add_widget(WakeScreen())
         
@@ -262,7 +259,7 @@ class SmartFanApp(App):
         pass
         #output = bytes("power", 'utf-8')
         #self.server_socket.sendall(output)
-
+   
     def touch_test(self):
         while True:
             if self.sm.on_touch_down() == True:
