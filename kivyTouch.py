@@ -4,7 +4,24 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.clock import Clock
 from kivy.uix.label import Label
 from kivy.core.window import Window
+from kivy.uix.widget import Widget
+from kivy.input import MotionEvent
+from kivy.uix.screenmanager import ScreenManager
 import socket
+import os
+import threading
+import time
+global start_time
+global display_on
+
+class WakeScreen(Widget):
+    def on_touch_down(self, touch):
+        global start_time
+        global display_on
+        start_time = time.time()
+        display_on = True
+        os.popen('bash backlight_on.sh')
+
 
 class SchedulingPage(GridLayout):
     def __init__(self, switch_home_callback, **kwargs):
@@ -29,12 +46,15 @@ class SchedulingPage(GridLayout):
         app.root.add_widget(app.build())
 
 
+
 class SmartFanApp(App):
     Window.clearcolor = (1, 1, 1, 1)
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.min_temp_label = None
         self.max_temp_label = None
+        self.display_on = True
+        self.start_time = time.time()
 
     def build(self):
         self.page = 0
@@ -46,16 +66,18 @@ class SmartFanApp(App):
         self.min = 0
         self.sched_list = []
         self.sched_label_list = []
+        self.sm = ScreenManager()
+        
+        t1 = threading.Thread(target=self.sleep_timer)
+        #t2 = threading.Thread(target=self.touch_test)
+        t1.start()
+        #t2.start()
         
         # Conn
         HOST = '192.168.1.161'    # The remote host
         PORT = 50007              # The same port as used by the server
-        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_socket.connect((HOST, PORT))
-
-        #print("\n\n\n\nType:")
-        #print(type(self.server_socket))
-        #print("\n\n\n\n")
+        #self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #self.server_socket.connect((HOST, PORT))
         
         layout = GridLayout(cols=2, rows=6, row_force_default=True, col_force_default= True, col_default_width=350, row_default_height=50)
 
@@ -147,8 +169,9 @@ class SmartFanApp(App):
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
-        layout.add_widget(Label())  # Empty space
+
         layout.add_widget(button_row_layout)
+        layout.add_widget(WakeScreen())
         
         #output = bytes("power", 'utf-8');
         #server_socket.sendall(output)
@@ -236,8 +259,38 @@ class SmartFanApp(App):
         app.root.add_widget(app.build())
 
     def fan_power(self, instance):
-        output = bytes("power", 'utf-8');
-        self.server_socket.sendall(output)
+        pass
+        #output = bytes("power", 'utf-8')
+        #self.server_socket.sendall(output)
+
+    def touch_test(self):
+        while True:
+            if self.sm.on_touch_down() == True:
+                print("True")
+            else:
+                print("False")
+                
+
+    def sleep_timer(self):
+        global start_time
+        global display_on
+        start_time = time.time()
+        display_on = True
+        while True:
+            if time.time() - start_time >= 10 and display_on:
+                display_on = False
+                os.popen('bash backlight_off.sh')
+
+                
+    def on_touch_down(self, touch):
+        print(touch.profile)
+        if self.display_on:
+            self.display_on = False
+            os.popen('bash backlight_off.sh')
+        else:
+            self.display_on = True
+            os.popen('bash backlight_on.sh')
+
    
 
 if __name__ == '__main__':
