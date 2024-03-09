@@ -17,8 +17,8 @@ class WakeScreen(Widget):
         global start_time
         global display_on
         start_time = time.time()
-            display_on = True
-            os.popen('bash backlight_on.sh')
+        display_on = True
+        os.popen('bash backlight_on.sh')
             
 
 class SchedulingPage(GridLayout):
@@ -56,7 +56,6 @@ class SmartFanApp(App):
 
     def build(self):
         self.page = 0
-        self.display_on = True
         self.min_temp = 70
         self.max_temp = 90
         self.hour = 12
@@ -64,18 +63,15 @@ class SmartFanApp(App):
         self.min = 0
         self.sched_list = []
         self.sched_label_list = []
-        self.sm = ScreenManager()
         
         t1 = threading.Thread(target=self.sleep_timer)
-        #t2 = threading.Thread(target=self.touch_test)
         t1.start()
-        #t2.start()
         
         # Conn
         HOST = '192.168.1.161'    # The remote host
         PORT = 50007              # The same port as used by the server
-        #self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #self.server_socket.connect((HOST, PORT))
+        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.connect((HOST, PORT))
         
         layout = GridLayout(cols=2, rows=6, row_force_default=True, col_force_default= True, col_default_width=350, row_default_height=50)
 
@@ -169,9 +165,6 @@ class SmartFanApp(App):
         layout.add_widget(Label())  # Empty space
         layout.add_widget(button_row_layout)
         layout.add_widget(WakeScreen())
-        
-        #output = bytes("power", 'utf-8');
-        #server_socket.sendall(output)
 
         return layout
 
@@ -256,17 +249,8 @@ class SmartFanApp(App):
         app.root.add_widget(app.build())
 
     def fan_power(self, instance):
-        pass
-        #output = bytes("power", 'utf-8')
-        #self.server_socket.sendall(output)
-   
-    def touch_test(self):
-        while True:
-            if self.sm.on_touch_down() == True:
-                print("True")
-            else:
-                print("False")
-                
+        output = bytes("power", 'utf-8')
+        self.server_socket.sendall(output)
 
     def sleep_timer(self):
         global start_time
@@ -277,16 +261,6 @@ class SmartFanApp(App):
             if time.time() - start_time >= 10 and display_on:
                 display_on = False
                 os.popen('bash backlight_off.sh')
-
-                
-    def on_touch_down(self, touch):
-        print(touch.profile)
-        if self.display_on:
-            self.display_on = False
-            os.popen('bash backlight_off.sh')
-        else:
-            self.display_on = True
-            os.popen('bash backlight_on.sh')
 
    
 
