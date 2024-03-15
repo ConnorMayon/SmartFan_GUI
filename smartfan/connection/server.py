@@ -1,9 +1,19 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from urllib.parse import urlparse, parse_qs
 import urllib
 import urllib.request
 import json
 import os
+from argparse import _SubParsersAction
+
+def define_argparser(command_parser: _SubParsersAction):
+    """
+    Define `server` subcommand.
+    """
+    p = command_parser.add_parser(
+        'server', help='start server connection')
+
+    p.set_defaults(handler=lambda args: start_server())
+
 
 class CustomHandler(BaseHTTPRequestHandler):
     kivyData = {}
@@ -99,7 +109,7 @@ class CustomHandler(BaseHTTPRequestHandler):
         else:
             self.send_error(404, 'File Not Found: %s' % self.path)
 
-def run():
+def start_server():
     PORT = 8000
     server_address = ('', PORT)
     httpd = HTTPServer(server_address, CustomHandler)
@@ -109,6 +119,3 @@ def run():
     except KeyboardInterrupt:
         httpd.server_close()
         print('Server stopped.')
-
-if __name__ == '__main__':
-    run()

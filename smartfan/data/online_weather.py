@@ -68,7 +68,7 @@ class Forecast:
 
     def getTemperatureCelsius(self):
         #Returns a list of temperatures in Celsius for the current through next 12 hours (13 total items)
-        print(self.weather_temp)
+        return self.weather_temp
 
     def getTemperatureFahrenheit(self):
         #Returns a list of temperatures in Fahrenheit for the current through next 12 hours (13 total items)
@@ -78,6 +78,4 @@ class Forecast:
         for index in range (0, 13):
             temps_fahrenheit[index] = self.weather_temp[index] * (9/5) + 32 #Celsius to Fahrenheit formula
             
-        print(temps_fahrenheit)
-
-test_bed = Forecast()
+        return temps_fahrenheit
