@@ -21,9 +21,11 @@ class Touch(Widget):
         if display_on:
             display_on = False
             os.popen('bash backlight_off.sh')
+            print("turning off")
         else:
             display_on = True
             os.popen('bash backlight_on.sh')
+            print("turning on")
 
 class SchedulingPage(GridLayout):
     def __init__(self, switch_home_callback, sched_list, **kwargs):
