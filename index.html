@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SMARTFAN GUI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>SMARTFAN GUI</h1>
+
+    <div class="titles-container">
+        <h2 class="center-title">Set Preferred Temperature Range</h2>
+        <h2 class="center-title">Set Preferred Cooling Time</h2>
+    </div>
+    <div class="preferences">
+        <div class="temperature-container">
+            <div class="temp-unit">
+                <div class="button-group">
+                    <button class="up" onclick="increaseAndLog('minTempValue', 'Min Temp increased')">Up</button>
+                    <span id="minTempValue">65</span>
+                    <button class="down" onclick="decreaseAndLog('minTempValue', 'Min Temp decreased')">Down</button>
+                </div>
+                <label for="minTemp">Min Temp</label>
+            </div>
+            <div class="temp-unit">
+                <div class="button-group">
+                    <button class="up" onclick="increaseAndLog('maxTempValue', 'Max Temp increased')">Up</button>
+                    <span id="maxTempValue">85</span>
+                    <button class="down" onclick="decreaseAndLog('maxTempValue', 'Max Temp decreased')">Down</button>
+                </div>
+                <label for="maxTemp">Max Temp</label>
+            </div>
+        </div>
+
+        <div class="time-container">
+            <div class="time-structure">
+                <div class="time-unit">
+                    <div class="button-group">
+                        <button class="hrup" onclick="increaseAndLog('hoursValue', 'Hours increased')">Up</button>
+                        <span class="time-value" id="hoursValue">5</span>
+                        <button class="hrdown" onclick="decreaseAndLog('hoursValue', 'Hours decreased')">Down</button>
+                    </div>
+                    <label for="hours">Hours</label>
+                </div>
+                <div class="time-unit">
+                    <div class="button-group">
+                        <button class="tenup" onclick="increaseAndLog('tenMinutesValue', '10 Minutes increased')">Up</button>
+                        <span class="time-value" id="tenMinutesValue">0</span>
+                        <button class="tendown" onclick="decreaseAndLog('tenMinutesValue', '10 Minutes decreased')">Down</button>
+                    </div>
+                    <label for="tenMinutes">Min</label>
+                </div>
+                <div class="time-unit">
+                    <div class="button-group">
+                        <button class="minup" onclick="increaseAndLog('minutesValue', '1 Minute increased')">Up</button>
+                        <span class="time-value" id="minutesValue">0</span>
+                        <button class="mindown" onclick="decreaseAndLog('minutesValue', '1 Minute decreased')">Down</button>
+                    </div>
+                    <label for="minutes">Min</label>
+                    <div id="message"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="button-group">
+        <button onclick="saveTime()">Save Time</button>
+        <button onclick="switchPage()">Switch Page</button>
+        <button onclick="fanPower()">Fan ON/OFF</button>
+        <button onclick="fetchData()">Update</button>
+    </div>
+
+    <script>
+        //increase value when button pressed and log
+        function increaseAndLog(elementId, message) {
+            var value = parseInt(document.getElementById(elementId).innerText);
+            document.getElementById(elementId).innerText = value + 1;
+            fetch('/log?message=' + message);
+            updateValues();
+        }
+        //decrease value when button pressed and log
+        function decreaseAndLog(elementId, message) {
+            var value = parseInt(document.getElementById(elementId).innerText);
+            if (value > 0) {
+                document.getElementById(elementId).innerText = value - 1;
+                fetch('/log?message=' + message);
+                updateValues();
+            }
+    }
+        //not working after updates
+        function saveTime() {
+         var hours = parseInt(document.getElementById('hoursValue').innerText);
+         var tenMinutes = parseInt(document.getElementById('tenMinutesValue').innerText);
+         var minutes = parseInt(document.getElementById('minutesValue').innerText);
+
+         var formattedTime = hours + ':' + tenMinutes + minutes;
+
+         var savedTimes = JSON.parse(localStorage.getItem('savedCoolingTimes')) || [];
+
+         savedTimes.push(formattedTime);
+
+         localStorage.setItem('savedCoolingTimes', JSON.stringify(savedTimes));
+
+         window.location.href = "schedule.html";
+        }
+        //not working after updates
+        //this is an attempted fix after updates
+        function switchPage() {
+            fetch('/switch')
+            .then(response => {
+             if (response.ok) {
+                window.location.href = "schedule.html";
+            } else {
+                console.error('Failed to switch page:', response.status);
+            }
+        })
+        .catch(error => console.error('Error switching page:', error));
+        }
+
+        function fanPower() {
+            
+        }
+        //gets kivy data from web server
+        function fetchData() {
+            fetch('/log')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length !== 0) {
+                     updateContent(data);
+                    }
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+        //updates values in web app according to data from kivy
+        function updateContent(data) {
+            if (data && Object.keys(data).length > 0) {
+                let minTemp = data.minTemp;
+                let maxTemp = data.maxTemp;
+                let hourVal = data.hourVal;
+                let tenVal = data.tenVal;
+                let minVal = data.minVal;
+
+                if (minTemp !== undefined) {
+                    document.getElementById('minTempValue').innerText = minTemp;
+                }
+
+                if (maxTemp !== undefined) {
+                    document.getElementById('maxTempValue').innerText = maxTemp;
+                }
+
+                if (hourVal !== undefined) {
+                    document.getElementById('hoursValue').innerText = hourVal;
+                }
+
+                if (tenVal !== undefined) {
+                    document.getElementById('tenMinutesValue').innerText = tenVal;
+                }
+
+                if (minVal !== undefined) {
+                    document.getElementById('minutesValue').innerText = minVal;
+                }
+            }
+        }
+
+
+        //sends values to web server from web app
+        function updateValues() {
+            var minTempValue = parseInt(document.getElementById('minTempValue').innerText);
+            var maxTempValue = parseInt(document.getElementById('maxTempValue').innerText);
+            var hoursValue = parseInt(document.getElementById('hoursValue').innerText);
+            var tenMinutesValue = parseInt(document.getElementById('tenMinutesValue').innerText);
+            var minutesValue = parseInt(document.getElementById('minutesValue').innerText);
+
+        fetch('/update_values', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                minTempValue: minTempValue,
+                maxTempValue: maxTempValue,
+                hoursValue: hoursValue,
+                tenMinutesValue: tenMinutesValue,
+                minutesValue: minutesValue
+            }),
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('Values updated successfully');
+            } else {
+                console.error('Failed to update values:', response.status);
+            }
+        })
+        .catch(error => console.error('Error updating values:', error));
+    }
+
+    </script>
+</body>
+
+</html>
