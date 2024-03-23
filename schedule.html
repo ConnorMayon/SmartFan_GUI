@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Schedule</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>Scheduling</h1>
+
+    <ul id="timesList"></ul>
+
+
+    <div class="button-group">
+        <button onclick="switchPage()">Switch Page</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var savedTimes = JSON.parse(localStorage.getItem('savedCoolingTimes'));
+            var timesList = document.getElementById('timesList');
+            if (savedTimes !== null && savedTimes.length > 0) {
+                savedTimes.forEach(function(time, index) {
+                    var listItem = document.createElement('li');
+                    listItem.textContent = time;
+                    timesList.appendChild(listItem);
+
+                    var deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.onclick = function() {
+                        deleteTime(index);
+                    };
+                    listItem.appendChild(deleteButton);
+                });
+            }
+        });
+
+        function deleteTime(index) {
+            var savedTimes = JSON.parse(localStorage.getItem('savedCoolingTimes'));
+            savedTimes.splice(index, 1); 
+            localStorage.setItem('savedCoolingTimes', JSON.stringify(savedTimes));
+            window.location.reload(); 
+        }
+
+        function switchPage() {
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+
+</html>

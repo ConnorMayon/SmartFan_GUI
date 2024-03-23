@@ -4,7 +4,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.clock import Clock
 from kivy.uix.label import Label
 from kivy.core.window import Window
-#from kivy.core.window import Widget
+from kivy.core.window import Widget
 from kivy.network.urlrequest import UrlRequest
 import urllib.parse
 import urllib.request
@@ -15,15 +15,15 @@ import json
 
 # global display_on
 
-# class Touch(Widget):
-#     def on_touch_down(self, touch):
-#         global display_on
-#         if display_on:
-#             display_on = False
-#             os.popen('bash backlight_off.sh')
-#         else:
-#             display_on = True
-#             os.popen('bash backlight_on.sh')
+class Touch(Widget):
+    def on_touch_down(self, touch):
+        global display_on
+        if display_on:
+            display_on = False
+            os.popen('bash backlight_off.sh')
+        else:
+            display_on = True
+            os.popen('bash backlight_on.sh')
 
 class SchedulingPage(GridLayout):
     def __init__(self, switch_home_callback, sched_list, **kwargs):
@@ -170,7 +170,9 @@ class SmartFanApp(App):
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
+        layout.add_widget(Label())  # Empty space
         layout.add_widget(button_row_layout)
+        layout.add_widget(WakeScreen())
 
         return layout
     
@@ -299,9 +301,18 @@ class SmartFanApp(App):
         app.root.add_widget(app.build())
 
     def fan_power(self, instance):
-        pass
-        #output = bytes("power", 'utf-8')
-        #self.server_socket.sendall(output)
+        output = bytes("power", 'utf-8')
+        self.server_socket.sendall(output)
+
+    def sleep_timer(self):
+        global start_time
+        global display_on
+        start_time = time.time()
+        display_on = True
+        while True:
+            if time.time() - start_time >= 10 and display_on:
+                display_on = False
+                os.popen('bash backlight_off.sh')
    
     def send_message(self):
         # Base URL of the server
@@ -322,8 +333,6 @@ class SmartFanApp(App):
         with urllib.request.urlopen(req) as response:
             response = response.read().decode('utf-8')
 
-
-    
 
 if __name__ == '__main__':
     SmartFanApp().run()
