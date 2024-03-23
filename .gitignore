@@ -1,8 +1,0 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
-
-/.vs/slnx.sqlite
-/.vs/SmartFan_GUI/FileContentIndex
-/.vs/SmartFan_GUI/v17/.wsuo
-/pi_server.py
