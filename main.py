@@ -13,10 +13,11 @@ import socket
 import os
 import json
 
-# global display_on
+global display_on
 
 class Touch(Widget):
     def on_touch_down(self, touch):
+        global display_on
         display_on = True
         if display_on:
             display_on = False
