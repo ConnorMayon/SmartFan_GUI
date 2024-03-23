@@ -18,7 +18,7 @@ global display_on
 class Touch(Widget):
     def on_touch_down(self, touch):
         global display_on
-        display_on = True
+        #display_on = True
         if display_on:
             display_on = False
             os.popen('bash backlight_off.sh')
@@ -69,8 +69,8 @@ class SmartFanApp(App):
         self.sched_list = []
         self.sched_label_list = []
 
-        # global display_on
-        # display_on = True
+        global display_on
+        display_on = True
         
         # # Conn
         # HOST = '192.168.1.161'    # The remote host
