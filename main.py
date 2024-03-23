@@ -17,7 +17,7 @@ import json
 
 class Touch(Widget):
     def on_touch_down(self, touch):
-        global display_on
+        display_on = True
         if display_on:
             display_on = False
             os.popen('bash backlight_off.sh')
