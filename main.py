@@ -14,19 +14,15 @@ import os
 import json
 
 global display_on
+global start_time
 
-class Touch(Widget):
+class WakeScreen(Widget):
     def on_touch_down(self, touch):
         global display_on
-        #display_on = True
-        if display_on:
-            display_on = False
-            os.popen('bash backlight_off.sh')
-            print("turning off")
-        else:
-            display_on = True
-            os.popen('bash backlight_on.sh')
-            print("turning on")
+        global start_time
+        start_time = time.Time()
+        display_on = True
+        os.popen('bash backlight_on.sh')
 
 class SchedulingPage(GridLayout):
     def __init__(self, switch_home_callback, sched_list, **kwargs):
@@ -175,6 +171,9 @@ class SmartFanApp(App):
         layout.add_widget(Label())  # Empty space
         layout.add_widget(button_row_layout)
         layout.add_widget(Touch())
+
+        st_thread = threading.Thread(target=self.sleep_timer)
+        st_thread.start()
 
         return layout
  
