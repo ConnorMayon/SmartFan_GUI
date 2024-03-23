@@ -181,7 +181,8 @@ class SmartFanApp(App):
  
     def make_request(self, instance):
         # Make a GET request
-        url = 'http://10.3.62.239:8000/data'
+        #url = 'http://10.3.62.239:8000/data'
+        url = 'http://192.168.1.18:8000/data'
         self.request = UrlRequest(url, on_success=self.on_success, on_failure=self.on_failure)
 
     def on_success(self, request, result):
