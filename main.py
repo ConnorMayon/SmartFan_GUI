@@ -4,7 +4,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.clock import Clock
 from kivy.uix.label import Label
 from kivy.core.window import Window
-from kivy.core.window import Widget
+from kivy.core.widget import Widget
 from kivy.network.urlrequest import UrlRequest
 import urllib.parse
 import urllib.request
