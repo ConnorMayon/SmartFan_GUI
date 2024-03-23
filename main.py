@@ -170,7 +170,7 @@ class SmartFanApp(App):
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
         layout.add_widget(button_row_layout)
-        layout.add_widget(Touch())
+        layout.add_widget(WakeScreen())
 
         st_thread = threading.Thread(target=self.sleep_timer)
         st_thread.start()
