@@ -172,15 +172,11 @@ class SmartFanApp(App):
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
         layout.add_widget(button_row_layout)
-        layout.add_widget(WakeScreen())
+        layout.add_widget(Touch())
 
         return layout
-    
-        #output = bytes("power", 'utf-8');
-        #server_socket.sendall(output)
-
-        #return Touch()
-    
+ 
+ 
     def make_request(self, instance):
         # Make a GET request
         url = 'http://10.3.62.239:8000/data'
