@@ -163,6 +163,7 @@ class SmartFanApp(App):
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
+        layout.add_widget(Label())  # Empty space
         layout.add_widget(button_row_layout)
         layout.add_widget(WakeScreen())
 
