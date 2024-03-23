@@ -1,1 +1,1 @@
-sudo -E sh -c 'echo 0 > /sys/class/backlight/10-0045/bl_power'
+sudo bash -c 'echo 0 > /sys/class/backlight/10-0045/bl_power'
