@@ -9,6 +9,7 @@ from kivy.network.urlrequest import UrlRequest
 import urllib.parse
 import urllib.request
 import threading
+import time
 from functools import partial
 import socket
 import os
