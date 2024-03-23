@@ -8,6 +8,7 @@ from kivy.uix.widget import Widget
 from kivy.network.urlrequest import UrlRequest
 import urllib.parse
 import urllib.request
+import threading
 from functools import partial
 import socket
 import os
