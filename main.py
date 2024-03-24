@@ -246,22 +246,22 @@ class SmartFanApp(App):
         self.hour -= 1
         if self.hour == -1:
             self.hour = 23
-            self.update_time_labels()
-            self.send_message()
+        self.update_time_labels()
+        self.send_message()
 
     def hour_inc_press(self, instance):
         self.hour += 1
         if self.hour == 24:
             self.hour = 0
-            self.update_time_labels()
-            self.send_message()
+        self.update_time_labels()
+        self.send_message()
 
     def ten_dec_press(self, instance):
         self.ten -= 1
         if self.ten == -1:
             self.ten = 5
-            self.update_time_labels()
-            self.send_message()
+        self.update_time_labels()
+        self.send_message()
 
     def ten_inc_press(self, instance):
         self.ten += 1
@@ -274,8 +274,8 @@ class SmartFanApp(App):
         self.min -= 1
         if self.min == -1:
             self.min = 9
-            self.update_time_labels()
-            self.send_message()
+        self.update_time_labels()
+        self.send_message()
 
     def min_inc_press(self, instance):
         self.min += 1
