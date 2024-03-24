@@ -22,7 +22,7 @@ class WakeScreen(Widget):
     def on_touch_down(self, touch):
         global display_on
         global start_time
-        start_time = time.Time()
+        start_time = time.time()
         display_on = True
         os.popen('bash backlight_on.sh')
 
