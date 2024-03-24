@@ -1,4 +1,5 @@
 from kivy.app import App
+from kivy.config import Config
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.clock import Clock
