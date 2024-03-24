@@ -313,8 +313,11 @@ class SmartFanApp(App):
 
 
 if __name__ == '__main__':
-    os.popen('xset dpms 15 15 15')
+    os.popen('xset dpms 15 15 15')  # Set screen blanking to 15 seconds
+    
+    # Set window to full screen
     Config.set('graphics', 'fullscreen', 'auto')
     Config.set('graphics', 'window_state', 'maximized')
     Config.write()
+    
     SmartFanApp().run()
