@@ -19,14 +19,6 @@ import json
 global display_on
 global start_time
 
-class WakeScreen(Widget):
-    def on_touch_down(self, touch):
-        global display_on
-        global start_time
-        start_time = time.time()
-        display_on = True
-        os.popen('bash backlight_on.sh')
-
 class SchedulingPage(GridLayout):
     def __init__(self, switch_home_callback, sched_list, **kwargs):
         super().__init__(**kwargs)
@@ -316,7 +308,6 @@ class SmartFanApp(App):
         self.server_socket.sendall(output)
 
     def sleep_timer(self):
-        pass
         global start_time
         global display_on
         start_time = time.time()
@@ -345,6 +336,15 @@ class SmartFanApp(App):
         # Send the request
         with urllib.request.urlopen(req) as response:
             response = response.read().decode('utf-8')
+            
+
+class WakeScreen(Widget):
+    def on_touch_down(self, touch):
+        global display_on
+        global start_time
+        start_time = time.time()
+        display_on = True
+        os.popen('bash backlight_on.sh')
 
 
 if __name__ == '__main__':

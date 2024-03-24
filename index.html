@@ -75,19 +75,59 @@
     <script>
         //increase value when button pressed and log
         function increaseAndLog(elementId, message) {
-            var value = parseInt(document.getElementById(elementId).innerText);
-            document.getElementById(elementId).innerText = value + 1;
+            var value = parseInt(document.getElementById('maxTempValue').innerText) + 1;
+            
+            switch (elementId) {
+                case 'minTempValue':
+                    var maxTempVal = parseInt(document.getElementById(elementId).innerText)
+                    if (value > maxTempVal)
+                        value == maxTempVal;
+                    break;
+                case 'hoursValue':
+                    if (value == 24)
+                        value = 0;
+                    break;
+                case 'tenMinutesValue':
+                    if (value == 6)
+                        value = 0;
+                    break;
+                case 'minutesValue':
+                    if (value == 10)
+                        value = 0;
+                    break;
+            }
+
+            document.getElementById(elementId).innerText = value;
             fetch('/log?message=' + message);
             updateValues();
         }
         //decrease value when button pressed and log
         function decreaseAndLog(elementId, message) {
-            var value = parseInt(document.getElementById(elementId).innerText);
-            if (value > 0) {
-                document.getElementById(elementId).innerText = value - 1;
-                fetch('/log?message=' + message);
-                updateValues();
+            var value = parseInt(document.getElementById(elementId).innerText) - 1;
+
+            switch (elementId) {
+                case 'maxTempValue':
+                    var minTempVal = parseInt(document.getElementById('minTempValue').innerText)
+                    if (value < minTempVal)
+                        value == minTempVal;
+                    break;
+                case 'hoursValue':
+                    if (value == -1)
+                        value = 23;
+                    break;
+                case 'tenMinutesValue':
+                    if (value == -1)
+                        value = 5;
+                    break;
+                case 'minutesValue':
+                    if (value == -1)
+                        value = 9;
+                    break;
             }
+
+            document.getElementById(elementId).innerText = value;
+            fetch('/log?message=' + message);
+            updateValues();
     }
         //not working after updates
         function saveTime() {
