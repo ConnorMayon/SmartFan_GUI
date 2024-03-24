@@ -212,14 +212,16 @@ class SmartFanApp(App):
         self.send_message()
 
     def on_min_temp_inc_press(self, instance):
-        self.min_temp += 1
-        self.update_temp_labels()
-        self.send_message()
+        if self.min_temp < self.max_temp:
+            self.min_temp += 1
+            self.update_temp_labels()
+            self.send_message()
 
     def on_max_temp_dec_press(self, instance):
-        self.max_temp -= 1
-        self.update_temp_labels()
-        self.send_message()
+        if self.min_temp < self.max_temp:
+            self.max_temp -= 1
+            self.update_temp_labels()
+            self.send_message()
 
     def on_max_temp_inc_press(self, instance):
         self.max_temp += 1
@@ -241,36 +243,44 @@ class SmartFanApp(App):
             self.min_label.text = str(self.min)
     
     def hour_dec_press(self, instance):
-        if self.hour > 1:
-            self.hour -= 1
+        self.hour -= 1
+        if self.hour == -1:
+            self.hour = 23
             self.update_time_labels()
             self.send_message()
 
     def hour_inc_press(self, instance):
-        if self.hour < 24:
-            self.hour += 1
+        self.hour += 1
+        if self.hour == 24:
+            self.hour = 0
             self.update_time_labels()
             self.send_message()
 
     def ten_dec_press(self, instance):
-        if self.ten > 0:
-            self.ten -= 1
+        self.ten -= 1
+        if self.ten == -1:
+            self.ten = 5
             self.update_time_labels()
             self.send_message()
 
     def ten_inc_press(self, instance):
         self.ten += 1
+        if self.ten == 6:
+            self.ten = 0
         self.update_time_labels()
         self.send_message()
 
     def min_dec_press(self, instance):
-        if self.min > 0:
-            self.min -= 1
+        self.min -= 1
+        if self.min == -1:
+            self.min = 9
             self.update_time_labels()
             self.send_message()
 
     def min_inc_press(self, instance):
         self.min += 1
+        if self.min == 10:
+            self.min = 0
         self.update_time_labels()
         self.send_message()
 
