@@ -307,18 +307,20 @@ class SmartFanApp(App):
         self.server_socket.sendall(output)
 
     def sleep_timer(self):
-        global start_time
-        global display_on
-        start_time = time.time()
-        display_on = True
-        while True:
-            if time.time() - start_time >= 10 and display_on:
-                display_on = False
-                os.popen('bash backlight_off.sh')
+        pass
+    #     global start_time
+    #     global display_on
+    #     start_time = time.time()
+    #     display_on = True
+    #     while True:
+    #         if time.time() - start_time >= 10 and display_on:
+    #             display_on = False
+    #             os.popen('bash backlight_off.sh')
    
     def send_message(self):
         # Base URL of the server
-        url = 'http://10.3.62.239:8000/log'
+        # url = 'http://10.3.62.239:8000/log'
+        url = 'http://192.168.1.18:8000/log'
 
         # Construct the query string
         query_params = urllib.parse.urlencode({
