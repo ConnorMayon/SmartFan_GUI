@@ -339,4 +339,6 @@ class SmartFanApp(App):
 
 if __name__ == '__main__':
     Config.set('graphics', 'fullscreen', 'auto')
+    Config.set('graphics', 'window_state', 'maximized')
+    Config.write()
     SmartFanApp().run()
