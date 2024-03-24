@@ -165,7 +165,7 @@ class SmartFanApp(App):
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
         layout.add_widget(button_row_layout)
-        layout.add_widget(WakeScreen())
+        #layout.add_widget(WakeScreen())
 
         #st_thread = threading.Thread(target=self.sleep_timer)
         #st_thread.start()
@@ -351,4 +351,5 @@ if __name__ == '__main__':
     Config.set('graphics', 'fullscreen', 'auto')
     Config.set('graphics', 'window_state', 'maximized')
     Config.write()
+    os.popen('bash set_blanking_timer.sh')
     SmartFanApp().run()
