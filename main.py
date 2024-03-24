@@ -174,8 +174,8 @@ class SmartFanApp(App):
         layout.add_widget(button_row_layout)
         layout.add_widget(WakeScreen())
 
-        st_thread = threading.Thread(target=self.sleep_timer)
-        st_thread.start()
+        #st_thread = threading.Thread(target=self.sleep_timer)
+        #st_thread.start()
 
         return layout
  
@@ -306,14 +306,14 @@ class SmartFanApp(App):
 
     def sleep_timer(self):
         pass
-    #     global start_time
-    #     global display_on
-    #     start_time = time.time()
-    #     display_on = True
-    #     while True:
-    #         if time.time() - start_time >= 10 and display_on:
-    #             display_on = False
-    #             os.popen('bash backlight_off.sh')
+        global start_time
+        global display_on
+        start_time = time.time()
+        display_on = True
+        while True:
+            if time.time() - start_time >= 10 and display_on:
+                display_on = False
+                os.popen('bash backlight_off.sh')
    
     def send_message(self):
         # Base URL of the server
@@ -337,4 +337,5 @@ class SmartFanApp(App):
 
 
 if __name__ == '__main__':
+    Window.fullscreen = True
     SmartFanApp().run()
