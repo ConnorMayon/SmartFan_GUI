@@ -16,9 +16,6 @@ import socket
 import os
 import json
 
-global display_on
-global start_time
-
 class SchedulingPage(GridLayout):
     def __init__(self, switch_home_callback, sched_list, **kwargs):
         super().__init__(**kwargs)
@@ -59,9 +56,6 @@ class SmartFanApp(App):
         self.min = 0
         self.sched_list = []
         self.sched_label_list = []
-
-        global display_on
-        display_on = True
         
         # # Conn
         # HOST = '192.168.1.161'    # The remote host
@@ -165,10 +159,6 @@ class SmartFanApp(App):
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
         layout.add_widget(button_row_layout)
-        layout.add_widget(WakeScreen())
-
-        #st_thread = threading.Thread(target=self.sleep_timer)
-        #st_thread.start()
 
         return layout
  
@@ -276,12 +266,6 @@ class SmartFanApp(App):
         self.update_time_labels()
         self.send_message()
 
-    #not implemented until integrated with web app
-    def sleep_timer(self, dt):
-        if self.display_on:
-            # Check if it's time to turn off the display
-            pass
-    
     #needs update after changes
     def save_time(self, instance):
         # Create a label with the formatted time
@@ -306,16 +290,6 @@ class SmartFanApp(App):
     def fan_power(self, instance):
         output = bytes("power", 'utf-8')
         self.server_socket.sendall(output)
-
-    def sleep_timer(self):
-        global start_time
-        global display_on
-        start_time = time.time()
-        display_on = True
-        while True:
-            if time.time() - start_time >= 10 and display_on:
-                display_on = False
-                os.popen('bash backlight_off.sh')
    
     def send_message(self):
         # Base URL of the server
@@ -336,15 +310,6 @@ class SmartFanApp(App):
         # Send the request
         with urllib.request.urlopen(req) as response:
             response = response.read().decode('utf-8')
-            
-
-class WakeScreen(Widget):
-    def on_touch_down(self, touch):
-        global display_on
-        global start_time
-        start_time = time.time()
-        display_on = True
-        os.popen('bash backlight_on.sh')
 
 
 if __name__ == '__main__':
