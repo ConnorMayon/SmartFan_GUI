@@ -337,5 +337,5 @@ class SmartFanApp(App):
 
 
 if __name__ == '__main__':
-    Window.fullscreen = True
+    Window.maximize()
     SmartFanApp().run()
