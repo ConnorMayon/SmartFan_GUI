@@ -348,6 +348,7 @@ class WakeScreen(Widget):
 
 
 if __name__ == '__main__':
+    os.popen('xset dpms 15 15 15')
     Config.set('graphics', 'fullscreen', 'auto')
     Config.set('graphics', 'window_state', 'maximized')
     Config.write()
