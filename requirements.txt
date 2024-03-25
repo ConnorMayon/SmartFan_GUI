@@ -1,0 +1,4 @@
+kivy
+bleak
+accuweather
+RPi.GPIO

@@ -5,16 +5,26 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.clock import Clock
 from kivy.uix.label import Label
 from kivy.core.window import Window
-from kivy.uix.widget import Widget
 from kivy.network.urlrequest import UrlRequest
+from smartfan.data.local_weather import Climate
+from smartfan.data.online_weather import Forecast
+from smartfan.prediction.prediction import Prediction
 import urllib.parse
 import urllib.request
 import threading
-import time
-from functools import partial
-import socket
 import os
-import json
+import asyncio
+from argparse import _SubParsersAction
+
+def define_argparser(command_parser: _SubParsersAction):
+    """
+    Define `run` subcommand.
+    """
+    p = command_parser.add_parser(
+        'run', help='run smartfan app')
+
+    p.set_defaults(handler=lambda args: run())
+
 
 class SchedulingPage(GridLayout):
     def __init__(self, switch_home_callback, sched_list, **kwargs):
@@ -56,7 +66,14 @@ class SmartFanApp(App):
         self.min = 0
         self.sched_list = []
         self.sched_label_list = []
+        self.forecast = Forecast()
+        self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
+        self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
+        self.prediction = Prediction(self.min_temp, self.max_temp, self.forecast, self.in_climate, self.out_climate)
         
+        t1 = threading.Thread(target=self.get_prediction)
+        t1.start()
+
         # # Conn
         # HOST = '192.168.1.161'    # The remote host
         # PORT = 50007              # The same port as used by the server
@@ -190,23 +207,27 @@ class SmartFanApp(App):
 
     def on_min_temp_dec_press(self, instance):
         self.min_temp -= 1
+        self.prediction.update_range_min(self.min_temp)
         self.update_temp_labels()
         self.send_message()
 
     def on_min_temp_inc_press(self, instance):
         if self.min_temp < self.max_temp:
             self.min_temp += 1
+            self.prediction.update_range_min(self.min_temp)
             self.update_temp_labels()
             self.send_message()
 
     def on_max_temp_dec_press(self, instance):
         if self.min_temp < self.max_temp:
             self.max_temp -= 1
+            self.prediction.update_range_max(self.max_temp)
             self.update_temp_labels()
             self.send_message()
 
     def on_max_temp_inc_press(self, instance):
         self.max_temp += 1
+        self.prediction.update_range_max(self.max_temp)
         self.update_temp_labels()
         self.send_message()
 
@@ -311,8 +332,18 @@ class SmartFanApp(App):
         with urllib.request.urlopen(req) as response:
             response = response.read().decode('utf-8')
 
+    async def get_prediction(self):
+        while True:
+            if self.prediction.predict():
+                output = bytes("power", 'utf-8')
+                self.server_socket.sendall(output)
+            else:
+                output = bytes("no power", 'utf-8')
+                self.server_socket.sendall(output)
+            await asyncio.sleep(540)
 
-if __name__ == '__main__':
+
+def run():
     os.popen('xset dpms 15 15 15')  # Set screen blanking to 15 seconds
     
     # Set window to full screen

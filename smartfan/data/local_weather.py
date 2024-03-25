@@ -67,7 +67,7 @@ class Climate:
         #gather current information for current_temp
         #method self.sensorClient()
 
-    def sensorClient(self):
+    async def sensorClient(self):
         #calling this method scans for thermobeacons
         scanner = BleakScanner(self.detection_callback)
         await scanner.start()
@@ -101,9 +101,11 @@ class Climate:
 
     def getTempF(self):
         #method to return temperature in Fahrenheit
+        return self.current_temp * (9/5) + 32 #Celsius to Fahrenheit formula
 
     def getTempC(self):
         #method to return temperature in Celsius
+        return self.current_temp
 
     def getTime(self):
         #method to return current time
@@ -112,8 +114,6 @@ class Climate:
     def getLocal(self):
         #method to return the location of the sensor (indoors or outdoors)
         return self.location
-
-test_bed_BT = Climate("Indoors", "44:fe:00:00:0e:d5")
 
 #BT Device 1
 #44:fe:00:00:0e:d5: ThermoBeacon

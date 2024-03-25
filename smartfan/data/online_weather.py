@@ -51,7 +51,7 @@ class Forecast:
 
             #Place temperatures in array and current temps
             weather_temp[0] = current_conditions['Temperature']['Metric']['Value']
-            for index in range (1, 13):
+            for index in range (1, 12):
                 weather_temp[index] = forecast_hourly[index]['Temperature']['Value']
 
             #assign attribute weather_temp as a list of temps
@@ -68,7 +68,7 @@ class Forecast:
 
     def getTemperatureCelsius(self):
         #Returns a list of temperatures in Celsius for the current through next 12 hours (13 total items)
-        print(self.weather_temp)
+        return self.weather_temp
 
     def getTemperatureFahrenheit(self):
         #Returns a list of temperatures in Fahrenheit for the current through next 12 hours (13 total items)
@@ -78,6 +78,4 @@ class Forecast:
         for index in range (0, 13):
             temps_fahrenheit[index] = self.weather_temp[index] * (9/5) + 32 #Celsius to Fahrenheit formula
             
-        print(temps_fahrenheit)
-
-test_bed = Forecast()
+        return temps_fahrenheit
