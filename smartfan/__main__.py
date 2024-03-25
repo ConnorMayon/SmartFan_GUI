@@ -1,8 +1,6 @@
 import sys
 from argparse import ArgumentParser
 from smartfan.app.gui import define_argparser as def_run
-from smartfan.connection.client import define_argparser as def_client
-from smartfan.connection.server import define_argparser as def_server
 
 
 def define_argparser() -> ArgumentParser:
@@ -16,8 +14,6 @@ def define_argparser() -> ArgumentParser:
         required=True)
 
     def_run(command_parser)
-    def_server(command_parser)
-    def_client(command_parser)
 
     return cli_parser
 

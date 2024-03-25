@@ -3,16 +3,6 @@ import urllib
 import urllib.request
 import json
 import os
-from argparse import _SubParsersAction
-
-def define_argparser(command_parser: _SubParsersAction):
-    """
-    Define `server` subcommand.
-    """
-    p = command_parser.add_parser(
-        'server', help='start server connection')
-
-    p.set_defaults(handler=lambda args: start_server())
 
 
 class CustomHandler(BaseHTTPRequestHandler):
