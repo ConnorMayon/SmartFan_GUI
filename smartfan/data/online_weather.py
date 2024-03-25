@@ -51,7 +51,7 @@ class Forecast:
 
             #Place temperatures in array and current temps
             weather_temp[0] = current_conditions['Temperature']['Metric']['Value']
-            for index in range (1, 13):
+            for index in range (1, 12):
                 weather_temp[index] = forecast_hourly[index]['Temperature']['Value']
 
             #assign attribute weather_temp as a list of temps

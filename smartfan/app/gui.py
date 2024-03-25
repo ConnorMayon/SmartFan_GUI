@@ -35,10 +35,6 @@ class SchedulingPage(GridLayout):
         self.col_default_width=90
         self.sched_list=sched_list
         self.message=""
-        self.forecast = Forecast()
-        self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
-        self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
-        self.prediction = Prediction(self, self.forecast, self.in_climate, self.out_climate)
         self.add_widget(Label())
         self.add_widget(Label())
         self.add_widget(Label())
@@ -70,6 +66,10 @@ class SmartFanApp(App):
         self.min = 0
         self.sched_list = []
         self.sched_label_list = []
+        self.forecast = Forecast()
+        self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
+        self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
+        self.prediction = Prediction(self.min_temp, self.max_temp, self.forecast, self.in_climate, self.out_climate)
         
         t1 = threading.Thread(target=self.get_prediction)
         t1.start()
@@ -207,23 +207,27 @@ class SmartFanApp(App):
 
     def on_min_temp_dec_press(self, instance):
         self.min_temp -= 1
+        self.prediction.update_range_min(self.min_temp)
         self.update_temp_labels()
         self.send_message()
 
     def on_min_temp_inc_press(self, instance):
         if self.min_temp < self.max_temp:
             self.min_temp += 1
+            self.prediction.update_range_min(self.min_temp)
             self.update_temp_labels()
             self.send_message()
 
     def on_max_temp_dec_press(self, instance):
         if self.min_temp < self.max_temp:
             self.max_temp -= 1
+            self.prediction.update_range_max(self.max_temp)
             self.update_temp_labels()
             self.send_message()
 
     def on_max_temp_inc_press(self, instance):
         self.max_temp += 1
+        self.prediction.update_range_max(self.max_temp)
         self.update_temp_labels()
         self.send_message()
 
