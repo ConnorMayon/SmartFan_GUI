@@ -2,7 +2,6 @@ from kivy.app import App
 from kivy.config import Config
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
-from kivy.clock import Clock
 from kivy.uix.label import Label
 from kivy.core.window import Window
 from kivy.network.urlrequest import UrlRequest
