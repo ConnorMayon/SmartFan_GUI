@@ -109,7 +109,7 @@ class CustomHandler(BaseHTTPRequestHandler):
         else:
             self.send_error(404, 'File Not Found: %s' % self.path)
 
-def start_server():
+if __name__ == "__main__":
     PORT = 8000
     server_address = ('', PORT)
     httpd = HTTPServer(server_address, CustomHandler)
