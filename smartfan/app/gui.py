@@ -366,10 +366,13 @@ class SmartFanApp(App):
             response = response.read().decode('utf-8')
 
     def get_prediction(self):
+        fan_state = false
         while True:
-            if self.prediction.predict():
+            if self.prediction.predict() and not fan_state:
+                fan_state = true
                 self.fan_power()
-            else:
+            if not self.prediction.predict() and fan_state:
+                fan_state = false
                 self.fan_power()
             time.sleep(540)
             
