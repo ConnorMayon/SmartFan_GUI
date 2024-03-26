@@ -384,6 +384,7 @@ class SmartFanApp(App):
     def test(self):
         i = 20
         while i > 0:
+            self.out_label = str(i)
             i = i - 1
             
 
