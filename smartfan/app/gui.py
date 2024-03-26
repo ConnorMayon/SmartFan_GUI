@@ -11,7 +11,6 @@ from smartfan.prediction.prediction import Prediction
 import urllib.parse
 import urllib.request
 import threading
-import os
 import time
 import asyncio
 import socket
@@ -366,13 +365,13 @@ class SmartFanApp(App):
             response = response.read().decode('utf-8')
 
     def get_prediction(self):
-        fan_state = false
+        fan_state = False
         while True:
             if self.prediction.predict() and not fan_state:
-                fan_state = true
+                fan_state = True
                 self.fan_power()
             if not self.prediction.predict() and fan_state:
-                fan_state = false
+                fan_state = False
                 self.fan_power()
             time.sleep(540)
             
