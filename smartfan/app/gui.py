@@ -378,7 +378,7 @@ class SmartFanApp(App):
                 self.in_label.text = str(self.in_temp)
             if self.out_label:
                 self.out_label.text = str(self.out_temp)
-            await asyncio.sleep(5)
+            sleep(5)
             
 
 
