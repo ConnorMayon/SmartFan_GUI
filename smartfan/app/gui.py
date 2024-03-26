@@ -14,6 +14,7 @@ import threading
 import os
 import time
 import asyncio
+import socket
 from argparse import _SubParsersAction
 
 def define_argparser(command_parser: _SubParsersAction):
@@ -71,19 +72,20 @@ class SmartFanApp(App):
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
         self.prediction = Prediction(self.min_temp, self.max_temp, self.forecast, self.in_climate, self.out_climate)
         #self.acctemp_array = self.forecast.getTemperatureFahrenheit()
-        #self.acc_temp = self.acctemp_array[0]
+        self.acctemp_array = [32, 30, 29, 28, 30, 31, 32, 29, 33, 25, 31, 33]
+        self.acc_temp = self.acctemp_array[0]
         self.acc_temp = 30
         self.in_temp  = self.in_climate.getTempF()
         self.out_temp = self.out_climate.getTempF()
         
-        #t1 = threading.Thread(target=self.get_prediction)
-        #t1.start()
+        t1 = threading.Thread(target=self.get_prediction)
+        t1.start()
 
         # # Conn
-        # HOST = '192.168.1.161'    # The remote host
-        # PORT = 50007              # The same port as used by the server
-        # #self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # #self.server_socket.connect((HOST, PORT))
+        HOST = '192.168.1.161'    # The remote host
+        PORT = 50007              # The same port as used by the server
+        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.connect((HOST, PORT))
 
         layout = GridLayout(cols=2, rows=6, row_force_default=True, col_force_default= True, col_default_width=350, row_default_height=50)
 
@@ -203,13 +205,10 @@ class SmartFanApp(App):
 
         layout.add_widget(temperature_layout)
         
-        #asyncio.run(self.update_local_temps())
-        #asyncio.run(self.update_local_temp(self.in_climate))
         it_thread = threading.Thread(target=self.update_inside_temp)
         it_thread.start()
         ot_thread = threading.Thread(target=self.update_outside_temp)
         ot_thread.start()
-        #asyncio.run(self.update_local_temp(self.out_climate))
 
         return layout
  
