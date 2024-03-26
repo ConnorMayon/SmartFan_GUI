@@ -373,7 +373,7 @@ class SmartFanApp(App):
             
     async def update_local_temp(self, climate):
         while True:
-            asyncio.run(self.climate.sensorClient())
+            asyncio.run(climate.sensorClient())
             self.in_temp  = self.in_climate.getTempF()
             self.out_temp = self.out_climate.getTempF()
             if self.in_label:
