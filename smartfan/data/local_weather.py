@@ -71,7 +71,7 @@ class Climate:
         #calling this method scans for thermobeacons
         scanner = BleakScanner(self.detection_callback)
         await scanner.start()
-        await asyncio.sleep(540)  #can be modified for amount of time to attempt pulling info
+        await asyncio.sleep(5)  #can be modified for amount of time to attempt pulling info
         await scanner.stop()
 
     def detection_callback(self, device, advertisement_data):
