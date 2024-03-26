@@ -69,6 +69,12 @@ class SmartFanApp(App):
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
         self.prediction = Prediction(self.min_temp, self.max_temp, self.forecast, self.in_climate, self.out_climate)
+        self.acctemp_array = self.forecast.getTemperatureFahrenheit()
+        self.acc_temp = self.acctemp_array[0]
+        self.in_temp  = 0
+        #self.in_climate.getTempF
+        self.out_temp = 0
+        #self.in_climate.getTempF
         
         t1 = threading.Thread(target=self.get_prediction)
         t1.start()
@@ -175,6 +181,27 @@ class SmartFanApp(App):
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
         layout.add_widget(button_row_layout)
+
+        temperature_layout = GridLayout(rows=2, cols=3, col_force_default=True, col_default_width=70, row_default_height=60)
+
+        acc_title = Label(color=[0, 0, 0, 1], text= "Forecast")
+        acc_label = Label(color=[0, 0, 0, 1], text=str(self.acc_temp))
+
+        in_title = Label(color=[0, 0, 0, 1], text= "Inside")
+        in_label = Label(color=[0, 0, 0, 1], text=str(self.in_temp))
+
+        out_title = Label(color=[0, 0, 0, 1], text= "Outside")
+        out_label = Label(color=[0, 0, 0, 1], text=str(self.out_temp))
+
+        temperature_layout.add_widget(acc_title)
+        temperature_layout.add_widget(in_title)
+        temperature_layout.add_widget(out_title)
+
+        temperature_layout.add_widget(acc_label)
+        temperature_layout.add_widget(in_label)
+        temperature_layout.add_widget(out_label)
+
+        layout.add_widget(temperature_layout)
 
         return layout
  
