@@ -372,10 +372,8 @@ class SmartFanApp(App):
         while True:
             self.in_temp  = self.in_climate.getTempF()
             self.out_temp = self.out_climate.getTempF()
-            if self.in_label:
-                self.in_label.text = str(self.in_temp)
-            if self.out_label:
-                self.out_label.text = str(self.out_temp)
+            self.in_label.text = str(self.in_temp)
+            self.out_label.text = str(self.out_temp)
             await asyncio.sleep(5)
             
 
