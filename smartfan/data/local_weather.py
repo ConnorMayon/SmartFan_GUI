@@ -68,7 +68,7 @@ class Climate:
         #method self.sensorClient()
         asyncio.run(self.sensorClient())
 
-    def sensorClient(self):
+    async def sensorClient(self):
         #calling this method scans for thermobeacons
         scanner = BleakScanner(self.detection_callback)
         await scanner.start()
@@ -102,9 +102,11 @@ class Climate:
 
     def getTempF(self):
         #method to return temperature in Fahrenheit
+        return self.current_temp * (9/5) + 32 #Celsius to Fahrenheit formula
 
     def getTempC(self):
         #method to return temperature in Celsius
+        return self.current_temp
 
     def getTime(self):
         #method to return current time
