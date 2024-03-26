@@ -13,8 +13,8 @@ from accuweather import (
 )
 
 #for use with accuweather API
-#API_KEY = "boA10L9ACMVoFVfUXykXE6G9hiiEPxGr"
-API_KEY = "RF9tFJCOIfkgstYMM5nVH11GUeNYdIne"
+API_KEY = "boA10L9ACMVoFVfUXykXE6G9hiiEPxGr"
+#API_KEY = "RF9tFJCOIfkgstYMM5nVH11GUeNYdIne"
 
 class Forecast:
     def __init__(self, curr_time = time.localtime(), latitude = 35.198284, longitude = -111.651299):
