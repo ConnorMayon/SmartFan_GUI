@@ -203,7 +203,7 @@ class SmartFanApp(App):
         layout.add_widget(temperature_layout)
         
         #asyncio.run(self.update_local_temps())
-        #asyncio.run(self.update_local_temp(self.in_climate))
+        asyncio.run(self.update_local_temp(self.in_climate))
         #asyncio.run(self.update_local_temp(self.out_climate))
 
         return layout
@@ -381,13 +381,7 @@ class SmartFanApp(App):
             if self.out_label:
                 self.out_label.text = str(self.out_temp)
             await asyncio.sleep(5)
-            
-    def test(self):
-        i = 20
-        while i > 0:
-            self.out_label = str(i)
-            i = i - 1
-            
+
 
 
 def run():
@@ -399,5 +393,3 @@ def run():
     Config.write()
     
     SmartFanApp().run()
-    
-    SmartFanApp().test()
