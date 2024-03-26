@@ -80,8 +80,8 @@
             switch (elementId) {
                 case 'minTempValue':
                     var maxTempVal = parseInt(document.getElementById('maxTempValue').innerText)
-                    if (value > maxTempVal)
-                        value == maxTempVal;
+                    if (value == maxTempVal)
+                        value = value - 1;
                     break;
                 case 'hoursValue':
                     if (value == 24)
@@ -108,8 +108,8 @@
             switch (elementId) {
                 case 'maxTempValue':
                     var minTempVal = parseInt(document.getElementById('minTempValue').innerText)
-                    if (value < minTempVal)
-                        value == minTempVal;
+                    if (value == minTempVal)
+                        value = value + 1;
                     break;
                 case 'hoursValue':
                     if (value == -1)
