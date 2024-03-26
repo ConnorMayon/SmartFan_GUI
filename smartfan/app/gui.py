@@ -364,7 +364,7 @@ class SmartFanApp(App):
         with urllib.request.urlopen(req) as response:
             response = response.read().decode('utf-8')
 
-    async def get_prediction(self):
+    def get_prediction(self):
         while True:
             if self.prediction.predict():
                 output = bytes("power", 'utf-8')
@@ -372,7 +372,7 @@ class SmartFanApp(App):
             else:
                 output = bytes("no power", 'utf-8')
                 self.server_socket.sendall(output)
-            await asyncio.sleep(540)
+            sleep(540)
             
     async def update_local_temp(self):
         while True:
