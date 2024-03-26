@@ -76,6 +76,9 @@ class SmartFanApp(App):
         
         t1 = threading.Thread(target=self.get_prediction)
         t1.start()
+        
+        temp_thread = threading.Thread(target=self.update_local_temps)
+        temp_thread.start()
 
         # # Conn
         # HOST = '192.168.1.161'    # The remote host
@@ -183,13 +186,13 @@ class SmartFanApp(App):
         temperature_layout = GridLayout(rows=2, cols=3, col_force_default=True, col_default_width=70, row_default_height=60)
 
         acc_title = Label(color=[0, 0, 0, 1], text= "Forecast")
-        acc_label = Label(color=[0, 0, 0, 1], text=str(self.acc_temp))
+        self.acc_label = Label(color=[0, 0, 0, 1], text=str(self.acc_temp))
 
         in_title = Label(color=[0, 0, 0, 1], text= "Inside")
-        in_label = Label(color=[0, 0, 0, 1], text=str(self.in_temp))
+        self.in_label = Label(color=[0, 0, 0, 1], text=str(self.in_temp))
 
         out_title = Label(color=[0, 0, 0, 1], text= "Outside")
-        out_label = Label(color=[0, 0, 0, 1], text=str(self.out_temp))
+        self.out_label = Label(color=[0, 0, 0, 1], text=str(self.out_temp))
 
         temperature_layout.add_widget(acc_title)
         temperature_layout.add_widget(in_title)
@@ -365,6 +368,17 @@ class SmartFanApp(App):
                 output = bytes("no power", 'utf-8')
                 self.server_socket.sendall(output)
             await asyncio.sleep(540)
+            
+    async def update_local_temps(self):
+        while True:
+            self.in_temp  = self.in_climate.getTempF()
+            self.out_temp = self.out_climate.getTempF()
+            if self.in_label:
+                self.in_label.text = str(self.in_temp)
+            if self.out_label:
+                self.out_label.text = str(self.out_temp)
+            await asyncio.sleep(540)
+            
 
 
 def run():
