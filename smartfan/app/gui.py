@@ -379,17 +379,17 @@ class SmartFanApp(App):
     def update_inside_temp(self):
         while True:
             asyncio.run(self.in_climate.sensorClient())
-            in_temp  = self.in_climate.getTempF()
+            self.in_temp  = self.in_climate.getTempF()
             if self.in_label:
-                self.in_label.text = str(in_temp)
+                self.in_label.text = str(self.in_temp)
             time.sleep(1)
             
     def update_outside_temp(self):
         while True:
             asyncio.run(self.out_climate.sensorClient())
-            out_temp = self.out_climate.getTempF()
+            self.out_temp = self.out_climate.getTempF()
             if self.out_label:
-                self.out_label.text = str(out_temp)
+                self.out_label.text = str(self.out_temp)
             time.sleep(1)
             
 
