@@ -12,6 +12,7 @@ import urllib.parse
 import urllib.request
 import threading
 import os
+import time
 import asyncio
 from argparse import _SubParsersAction
 
@@ -204,8 +205,10 @@ class SmartFanApp(App):
         
         #asyncio.run(self.update_local_temps())
         #asyncio.run(self.update_local_temp(self.in_climate))
-        t1 = threading.Thread(target=self.update_local_temp)
-        t1.start()
+        it_thread = threading.Thread(target=self.update_inside_temp)
+        it_thread.start()
+        ot_thread = threading.Thread(target=self.update_outside_temp)
+        ot_thread.start()
         #asyncio.run(self.update_local_temp(self.out_climate))
 
         return layout
@@ -371,21 +374,26 @@ class SmartFanApp(App):
             else:
                 output = bytes("no power", 'utf-8')
                 self.server_socket.sendall(output)
-            sleep(540)
+            time.sleep(540)
             
-    def update_local_temp(self):
+    def update_inside_temp(self):
         while True:
             asyncio.run(self.in_climate.sensorClient())
-            sleep(5)
-            asyncio.run(self.out_climate.sensorClient())
-            sleep(5)
+            #time.sleep(5)
             in_temp  = self.in_climate.getTempF()
-            out_temp = self.out_climate.getTempF()
             if self.in_label:
                 self.in_label.text = str(in_temp)
+            time.sleep(5)
+            
+    def update_outside_temp(self):
+        while True:
+            asyncio.run(self.out_climate.sensorClient())
+            #time.sleep(5)
+            out_temp = self.out_climate.getTempF()
             if self.out_label:
                 self.out_label.text = str(out_temp)
-            sleep(5)
+            time.sleep(5)
+            
 
 
 
