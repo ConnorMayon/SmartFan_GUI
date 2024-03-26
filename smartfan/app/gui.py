@@ -77,7 +77,7 @@ class SmartFanApp(App):
         t1 = threading.Thread(target=self.get_prediction)
         t1.start()
         
-        asyncio.run(update_local_temps())
+        asyncio.run(self.update_local_temps())
 
         # # Conn
         # HOST = '192.168.1.161'    # The remote host
