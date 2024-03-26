@@ -205,7 +205,7 @@ class SmartFanApp(App):
         
         #asyncio.run(self.update_local_temps())
         #asyncio.run(self.update_local_temp(self.in_climate))
-        #asyncio.run(self.update_local_temp(self.out_climate))
+        asyncio.run(self.update_local_temp(self.out_climate))
 
         return layout
  
