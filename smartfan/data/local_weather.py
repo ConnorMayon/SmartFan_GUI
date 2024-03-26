@@ -66,7 +66,6 @@ class Climate:
 
         #gather current information for current_temp
         #method self.sensorClient()
-        asyncio.run(self.sensorClient())
 
     async def sensorClient(self):
         #calling this method scans for thermobeacons
