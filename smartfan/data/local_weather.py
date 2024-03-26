@@ -4,7 +4,6 @@
 import time
 import asyncio
 import logging
-import math
 
 from bleak import BleakClient, BleakScanner
 
@@ -102,7 +101,7 @@ class Climate:
 
     def getTempF(self):
         #method to return temperature in Fahrenheit
-        return math.truncate(self.current_temp * (9/5) + 32, 2) #Celsius to Fahrenheit formula
+        return round(self.current_temp * (9/5) + 32, 2) #Celsius to Fahrenheit formula
 
     def getTempC(self):
         #method to return temperature in Celsius
