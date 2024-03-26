@@ -68,6 +68,7 @@ class SmartFanApp(App):
         #self.forecast = Forecast()
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
+        self.out_climate.current_temp = 100
         #self.prediction = Prediction(self.min_temp, self.max_temp, self.forecast, self.in_climate, self.out_climate)
         #self.acctemp_array = self.forecast.getTemperatureFahrenheit()
         #self.acc_temp = self.acctemp_array[0]
@@ -203,7 +204,7 @@ class SmartFanApp(App):
         layout.add_widget(temperature_layout)
         
         #asyncio.run(self.update_local_temps())
-        asyncio.run(self.update_local_temp(self.in_climate))
+        #asyncio.run(self.update_local_temp(self.in_climate))
         #asyncio.run(self.update_local_temp(self.out_climate))
 
         return layout
@@ -385,7 +386,7 @@ class SmartFanApp(App):
 
 
 def run():
-    os.popen('xset dpms 15 15 15')  # Set screen blanking to 15 seconds
+    #os.popen('xset dpms 15 15 15')  # Set screen blanking to 15 seconds
     
     # Set window to full screen
     Config.set('graphics', 'fullscreen', 'auto')
