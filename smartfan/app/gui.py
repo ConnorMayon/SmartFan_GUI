@@ -368,11 +368,9 @@ class SmartFanApp(App):
     def get_prediction(self):
         while True:
             if self.prediction.predict():
-                output = bytes("power", 'utf-8')
-                self.server_socket.sendall(output)
+                self.fan_power()
             else:
-                output = bytes("no power", 'utf-8')
-                self.server_socket.sendall(output)
+                self.fan_power()
             time.sleep(540)
             
     def update_inside_temp(self):
