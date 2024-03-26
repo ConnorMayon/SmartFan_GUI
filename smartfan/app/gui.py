@@ -71,10 +71,8 @@ class SmartFanApp(App):
         self.prediction = Prediction(self.min_temp, self.max_temp, self.forecast, self.in_climate, self.out_climate)
         self.acctemp_array = self.forecast.getTemperatureFahrenheit()
         self.acc_temp = self.acctemp_array[0]
-        self.in_temp  = 0
-        #self.in_climate.getTempF
-        self.out_temp = 0
-        #self.in_climate.getTempF
+        self.in_temp  = self.in_climate.getTempF()
+        self.out_temp = self.out_climate.getTempF()
         
         t1 = threading.Thread(target=self.get_prediction)
         t1.start()
