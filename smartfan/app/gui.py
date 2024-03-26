@@ -201,7 +201,9 @@ class SmartFanApp(App):
 
         layout.add_widget(temperature_layout)
         
-        asyncio.run(self.update_local_temps())
+        lt_thread = threading.Thread(target=self.update_local_temps)
+        lt_thread.start()
+        #asyncio.run(self.update_local_temps())
 
         return layout
  
@@ -368,7 +370,7 @@ class SmartFanApp(App):
                 self.server_socket.sendall(output)
             await asyncio.sleep(540)
             
-    async def update_local_temps(self):
+    def update_local_temps(self):
         while True:
             self.in_temp  = self.in_climate.getTempF()
             self.out_temp = self.out_climate.getTempF()
