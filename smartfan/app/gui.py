@@ -67,10 +67,10 @@ class SmartFanApp(App):
         self.min = 0
         self.sched_list = []
         self.sched_label_list = []
-        self.forecast = Forecast()
+        #self.forecast = Forecast()
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
-        self.prediction = Prediction(self.min_temp, self.max_temp, self.forecast, self.in_climate, self.out_climate)
+        #self.prediction = Prediction(self.min_temp, self.max_temp, self.forecast, self.in_climate, self.out_climate)
         #self.acctemp_array = self.forecast.getTemperatureFahrenheit()
         self.acctemp_array = [32, 30, 29, 28, 30, 31, 32, 29, 33, 25, 31, 33]
         self.acc_temp = self.acctemp_array[0]
@@ -366,15 +366,15 @@ class SmartFanApp(App):
             response = response.read().decode('utf-8')
 
     def get_prediction(self):
-        fan_state = false
-        while True:
-            if self.prediction.predict() and not fan_state:
-                fan_state = true
-                self.fan_power()
-            if not self.prediction.predict() and fan_state:
-                fan_state = false
-                self.fan_power()
-            time.sleep(540)
+        fan_state = False
+        #while True:
+            #if self.prediction.predict() and not fan_state:
+            #    fan_state = True
+            #    self.fan_power()
+            #if not self.prediction.predict() and fan_state:
+            #    fan_state = False
+            #    self.fan_power()
+            #time.sleep(540)
             
     def update_inside_temp(self):
         while True:
