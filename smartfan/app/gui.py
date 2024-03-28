@@ -205,10 +205,10 @@ class SmartFanApp(App):
 
         layout.add_widget(temperature_layout)
         
-        it_thread = threading.Thread(target=self.update_inside_temp)
-        it_thread.start()
-        ot_thread = threading.Thread(target=self.update_outside_temp)
-        ot_thread.start()
+        #it_thread = threading.Thread(target=self.update_inside_temp)
+        #it_thread.start()
+        #ot_thread = threading.Thread(target=self.update_outside_temp)
+        #ot_thread.start()
 
         return layout
  
