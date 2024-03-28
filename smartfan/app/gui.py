@@ -69,7 +69,7 @@ class SmartFanApp(App):
         self.forecast = Forecast()
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
-        self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, self.forecast)
+        #self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, self.forecast)
         #self.acctemp_array = self.forecast.getTemperatureFahrenheit()
         self.acctemp_array = [32, 30, 29, 28, 30, 31, 32, 29, 33, 25, 31, 33]
         self.acc_temp = self.acctemp_array[0]
@@ -77,8 +77,8 @@ class SmartFanApp(App):
         self.in_temp = 0
         self.out_temp = 0
         
-        t1 = threading.Thread(target=self.get_prediction)
-        t1.start()
+        #t1 = threading.Thread(target=self.get_prediction)
+        #t1.start()
 
         # # Conn
         #HOST = '192.168.1.161'    # The remote host
@@ -242,27 +242,27 @@ class SmartFanApp(App):
 
     def on_min_temp_dec_press(self, instance):
         self.min_temp -= 1
-        self.prediction.update_range_min(self.min_temp)
+        #self.prediction.update_range_min(self.min_temp)
         self.update_temp_labels()
         self.send_message()
 
     def on_min_temp_inc_press(self, instance):
         if self.min_temp < self.max_temp:
             self.min_temp += 1
-            self.prediction.update_range_min(self.min_temp)
+            #self.prediction.update_range_min(self.min_temp)
             self.update_temp_labels()
             self.send_message()
 
     def on_max_temp_dec_press(self, instance):
         if self.min_temp < self.max_temp:
             self.max_temp -= 1
-            self.prediction.update_range_max(self.max_temp)
+            #self.prediction.update_range_max(self.max_temp)
             self.update_temp_labels()
             self.send_message()
 
     def on_max_temp_inc_press(self, instance):
         self.max_temp += 1
-        self.prediction.update_range_max(self.max_temp)
+        #self.prediction.update_range_max(self.max_temp)
         self.update_temp_labels()
         self.send_message()
 
