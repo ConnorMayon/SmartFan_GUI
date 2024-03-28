@@ -11,7 +11,10 @@ from smartfan.prediction.prediction import Prediction
 import urllib.parse
 import urllib.request
 import threading
+<<<<<<< HEAD
 import os
+=======
+>>>>>>> 5752e814873eff80deb9f142c95bb9585591c47d
 import time
 import asyncio
 import socket
@@ -367,6 +370,7 @@ class SmartFanApp(App):
 
     def get_prediction(self):
         fan_state = False
+<<<<<<< HEAD
         #while True:
             #if self.prediction.predict() and not fan_state:
             #    fan_state = True
@@ -375,6 +379,16 @@ class SmartFanApp(App):
             #    fan_state = False
             #    self.fan_power()
             #time.sleep(540)
+=======
+        while True:
+            if self.prediction.predict() and not fan_state:
+                fan_state = True
+                self.fan_power()
+            if not self.prediction.predict() and fan_state:
+                fan_state = False
+                self.fan_power()
+            time.sleep(540)
+>>>>>>> 5752e814873eff80deb9f142c95bb9585591c47d
             
     def update_inside_temp(self):
         while True:
