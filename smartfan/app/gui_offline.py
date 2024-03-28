@@ -11,6 +11,7 @@ from smartfan.prediction.prediction import Prediction
 import urllib.parse
 import urllib.request
 import threading
+import os
 import time
 import asyncio
 import socket
@@ -81,8 +82,7 @@ class SmartFanApp(App):
         t1.start()
 
         # # Conn
-        #HOST = '192.168.1.161'    # The remote host
-        HOST = '10.24.0.32'
+        HOST = '192.168.1.161'    # The remote host
         PORT = 50007              # The same port as used by the server
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.connect((HOST, PORT))
@@ -216,9 +216,7 @@ class SmartFanApp(App):
     def make_request(self, instance):
         # Make a GET request
         # url = 'http://10.3.62.239:8000/data'
-        #url = 'http://192.168.1.18:8000/data'
-        url = 'http://10.24.4.194:8000/data'
-
+        url = 'http://192.168.1.18:8000/data'
         self.request = UrlRequest(url, on_success=self.on_success, on_failure=self.on_failure)
 
     def on_success(self, request, result):
@@ -350,8 +348,7 @@ class SmartFanApp(App):
     def send_message(self):
         # Base URL of the server
         # url = 'http://10.3.62.239:8000/log'
-        #url = 'http://192.168.1.18:8000/log'
-        url = 'http://10.24.4.194:8000/log'
+        url = 'http://192.168.1.18:8000/log'
 
         # Construct the query string
         query_params = urllib.parse.urlencode({
@@ -370,15 +367,15 @@ class SmartFanApp(App):
 
     def get_prediction(self):
         fan_state = False
-        while True:
-            if self.prediction.predict() and not fan_state:
-                fan_state = True
-                self.fan_power()
-            if not self.prediction.predict() and fan_state:
-                fan_state = False
-                self.fan_power()
-            time.sleep(540)
-                        
+        #while True:
+            #if self.prediction.predict() and not fan_state:
+            #    fan_state = True
+            #    self.fan_power()
+            #if not self.prediction.predict() and fan_state:
+            #    fan_state = False
+            #    self.fan_power()
+            #time.sleep(540)
+            
     def update_inside_temp(self):
         while True:
             asyncio.run(self.in_climate.sensorClient())
