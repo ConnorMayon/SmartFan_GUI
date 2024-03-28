@@ -216,8 +216,7 @@ class SmartFanApp(App):
     def make_request(self, instance):
         # Make a GET request
         # url = 'http://10.3.62.239:8000/data'
-        #url = 'http://192.168.1.18:8000/data'
-        url = 'http://10.24.4.194:8000/data'
+        url = 'http://192.168.1.18:8000/data'
 
         self.request = UrlRequest(url, on_success=self.on_success, on_failure=self.on_failure)
 
@@ -350,8 +349,7 @@ class SmartFanApp(App):
     def send_message(self):
         # Base URL of the server
         # url = 'http://10.3.62.239:8000/log'
-        #url = 'http://192.168.1.18:8000/log'
-        url = 'http://10.24.4.194:8000/log'
+        url = 'http://192.168.1.18:8000/log'
 
         # Construct the query string
         query_params = urllib.parse.urlencode({
