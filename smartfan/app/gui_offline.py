@@ -74,6 +74,8 @@ class SmartFanApp(App):
         self.acctemp_array = [32, 30, 29, 28, 30, 31, 32, 29, 33, 25, 31, 33]
         self.acc_temp = self.acctemp_array[0]
         self.acc_temp = 30
+        self.in_temp  = self.in_climate.getTempF()
+        self.out_temp = self.out_climate.getTempF()
         
         t1 = threading.Thread(target=self.get_prediction)
         t1.start()
@@ -187,10 +189,10 @@ class SmartFanApp(App):
         self.acc_label = Label(color=[0, 0, 0, 1], text=str(self.acc_temp))
 
         in_title = Label(color=[0, 0, 0, 1], text= "Inside")
-        self.in_label = Label(color=[0, 0, 0, 1], text="Connecting")
+        self.in_label = Label(color=[0, 0, 0, 1], text=str(self.in_temp))
 
         out_title = Label(color=[0, 0, 0, 1], text= "Outside")
-        self.out_label = Label(color=[0, 0, 0, 1], text="Connecting")
+        self.out_label = Label(color=[0, 0, 0, 1], text=str(self.out_temp))
 
         temperature_layout.add_widget(acc_title)
         temperature_layout.add_widget(in_title)
