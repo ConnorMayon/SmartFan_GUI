@@ -172,9 +172,9 @@ class SmartFanApp(App):
 
         button_row_layout.add_widget(fan_power_button)
 
-        update_button = Button(text='Update', background_color= [0.075, 0.71, 0.918, 1], on_press=self.make_request)
+        #update_button = Button(text='Update', background_color= [0.075, 0.71, 0.918, 1], on_press=self.make_request)
 
-        button_row_layout.add_widget(update_button)
+        #button_row_layout.add_widget(update_button)
 
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
@@ -209,6 +209,8 @@ class SmartFanApp(App):
         it_thread.start()
         ot_thread = threading.Thread(target=self.update_outside_temp)
         ot_thread.start()
+        update_thread = threading.Thread(target=self.make_request)
+        update_thread.start()
 
         return layout
  
@@ -217,7 +219,9 @@ class SmartFanApp(App):
         # Make a GET request
         # url = 'http://10.3.62.239:8000/data'
         url = 'http://192.168.1.18:8000/data'
-        self.request = UrlRequest(url, on_success=self.on_success, on_failure=self.on_failure)
+        while True:
+            self.request = UrlRequest(url, on_success=self.on_success, on_failure=self.on_failure)
+            sleep(5)
 
     def on_success(self, request, result):
         print("Received data:", result)
