@@ -172,9 +172,9 @@ class SmartFanApp(App):
 
         button_row_layout.add_widget(fan_power_button)
 
-        #update_button = Button(text='Update', background_color= [0.075, 0.71, 0.918, 1], on_press=self.make_request)
+        update_button = Button(text='Update', background_color= [0.075, 0.71, 0.918, 1], on_press=self.make_request)
 
-        #button_row_layout.add_widget(update_button)
+        button_row_layout.add_widget(update_button)
 
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
