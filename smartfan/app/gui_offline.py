@@ -205,12 +205,9 @@ class SmartFanApp(App):
 
         layout.add_widget(temperature_layout)
         
-        it_thread = threading.Thread(target=self.update_inside_temp)
-        it_thread.start()
-        ot_thread = threading.Thread(target=self.update_outside_temp)
-        ot_thread.start()
-        update_thread = threading.Thread(target=self.make_request)
-        update_thread.start()
+        it_thread = threading.Thread(target=self.update_inside_temp).start()
+        ot_thread = threading.Thread(target=self.update_outside_temp).start()
+        update_thread = threading.Thread(target=self.make_request).start()
 
         return layout
  
@@ -219,9 +216,9 @@ class SmartFanApp(App):
         # Make a GET request
         # url = 'http://10.3.62.239:8000/data'
         url = 'http://192.168.1.18:8000/data'
-        while True:
-            self.request = UrlRequest(url, on_success=self.on_success, on_failure=self.on_failure)
-            sleep(5)
+        #while True:
+        self.request = UrlRequest(url, on_success=self.on_success, on_failure=self.on_failure)
+            #sleep(5)
 
     def on_success(self, request, result):
         print("Received data:", result)
