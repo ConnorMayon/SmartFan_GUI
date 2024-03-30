@@ -207,7 +207,7 @@ class SmartFanApp(App):
         
         it_thread = threading.Thread(target=self.update_inside_temp).start()
         ot_thread = threading.Thread(target=self.update_outside_temp).start()
-        update_thread = threading.Thread(target=self.make_request).start()
+        #update_thread = threading.Thread(target=self.make_request).start()
 
         return layout
  
