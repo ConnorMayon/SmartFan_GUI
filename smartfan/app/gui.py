@@ -11,7 +11,6 @@ from smartfan.prediction.prediction import Prediction
 import urllib.parse
 import urllib.request
 import threading
-import os
 import time
 import asyncio
 import socket

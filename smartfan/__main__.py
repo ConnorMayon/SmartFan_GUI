@@ -14,6 +14,7 @@ def define_argparser() -> ArgumentParser:
         dest="command",
         required=True)
 
+    def_run(command_parser)
     def_run_offline(command_parser)
 
     return cli_parser
