@@ -81,8 +81,8 @@ class SmartFanApp(App):
         t1.start()
 
         # # Conn
-        HOST = '192.168.1.161'    # The remote host
-        PORT = 50007              # The same port as used by the server
+        HOST = '47.215.138.127'    # The remote host
+        PORT = 8000              # The same port as used by the server
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.connect((HOST, PORT))
 
