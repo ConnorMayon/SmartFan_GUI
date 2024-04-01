@@ -1,7 +1,5 @@
 from smartfan.data.local_weather import Climate
 from smartfan.data.online_weather import Forecast
-import time
-import datetime
 
 class Prediction():
     def __init__(self, range_min: int, range_max: int, in_climate: Climate, out_climate: Climate, forecast: Forecast):
@@ -27,10 +25,8 @@ class Prediction():
         in_temp = self.in_climate.getTempF()
         out_temp = self.out_climate.getTempF()
         forecast_temp = self.forecast.getTemperatureFahrenheit()
-        curr_time = time.localtime()
-        preferred_time = datetime.time(hour=self.app.hour, minute=self.app.ten + self.app.min)
 
-        # temporary data analysis code to determine whether temperature is increasing or decreating
+        # temporary data analysis code to determine whether temperature is increasing or decreasing
         min_temp = out_temp
         max_temp = out_temp
         num_dec = 0
@@ -50,25 +46,21 @@ class Prediction():
         temp_increasing = num_inc > num_dec and max_temp > self.range_max
         temp_decreasing = num_inc < num_dec and min_temp < self.range_min
 
-        # if within preffered cooling time
-        if curr_time >= preferred_time:
-            # if temp not in range, activate iff outside temperature is closer to desired range
-            if in_temp not in range(self.range_min, self.range_max):
-                if in_temp > self.range_max and out_temp < in_temp:
-                    return True
-                elif in_temp < self.range_min and out_temp > in_temp:
-                    return True
-                else:
-                    return False
-            
-            # if temp in range, activate if forecasted temperates are moving out of range and
-            # there is room to move in the opposite direction of forecast
+        # if temp not in range, activate iff outside temperature is closer to desired range
+        if in_temp not in range(self.range_min, self.range_max):
+            if in_temp > self.range_max and out_temp < in_temp:
+                return True
+            elif in_temp < self.range_min and out_temp > in_temp:
+                return True
             else:
-                if temp_increasing and out_temp < in_temp and in_temp > self.range_min:
-                    return True
-                elif temp_decreasing and out_temp > in_temp and in_temp < self.range_max:
-                    return True
-                else: 
-                    return False
+                return False
+            
+        # if temp in range, activate if forecasted temperates are moving out of range and
+        # there is room to move in the opposite direction of forecast
         else:
-            return False
+            if temp_increasing and out_temp < in_temp and in_temp > self.range_min:
+                return True
+            elif temp_decreasing and out_temp > in_temp and in_temp < self.range_max:
+                return True
+            else: 
+                return False

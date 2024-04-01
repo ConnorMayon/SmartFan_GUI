@@ -81,8 +81,8 @@ class SmartFanApp(App):
         t1.start()
 
         # # Conn
-        HOST = '192.168.1.161'    # The remote host
-        PORT = 50007              # The same port as used by the server
+        HOST = '47.215.138.127'    # The remote host
+        PORT = 8000              # The same port as used by the server
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.connect((HOST, PORT))
 
@@ -365,13 +365,13 @@ class SmartFanApp(App):
             response = response.read().decode('utf-8')
 
     def get_prediction(self):
-        fan_state = false
+        fan_state = False
         while True:
             if self.prediction.predict() and not fan_state:
-                fan_state = true
+                fan_state = True
                 self.fan_power()
             if not self.prediction.predict() and fan_state:
-                fan_state = false
+                fan_state = False
                 self.fan_power()
             time.sleep(540)
             
