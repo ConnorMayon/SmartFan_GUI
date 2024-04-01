@@ -368,11 +368,14 @@ class SmartFanApp(App):
         fan_state = False
         while True:
             if self.prediction.predict() and not fan_state:
+                print("Fan on from algorithm.")
                 fan_state = True
                 self.fan_power()
             if not self.prediction.predict() and fan_state:
+                print("Fan off from algorithm.")
                 fan_state = False
                 self.fan_power()
+            print("No action from prediction loop.")
             time.sleep(540)
             
     def update_inside_temp(self):
