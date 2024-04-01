@@ -69,11 +69,11 @@ class SmartFanApp(App):
         self.forecast = Forecast()
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
-        self.prediction = Prediction(self.min_temp, self.max_temp, self.forecast, self.in_climate, self.out_climate)
-        #self.acctemp_array = self.forecast.getTemperatureFahrenheit()
-        self.acctemp_array = [32, 30, 29, 28, 30, 31, 32, 29, 33, 25, 31, 33]
+        self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, self.forecast)
+        self.acctemp_array = self.forecast.getTemperatureFahrenheit()
+        #self.acctemp_array = [32, 30, 29, 28, 30, 31, 32, 29, 33, 25, 31, 33]
         self.acc_temp = self.acctemp_array[0]
-        self.acc_temp = 30
+        #self.acc_temp = 30
         self.in_temp  = 0
         self.out_temp = 0
         
@@ -81,8 +81,8 @@ class SmartFanApp(App):
         t1.start()
 
         # # Conn
-        HOST = '47.215.138.127'    # The remote host
-        PORT = 8000              # The same port as used by the server
+        HOST = '192.168.1.161'    # The remote host
+        PORT = 50007              # The same port as used by the server
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.connect((HOST, PORT))
 
@@ -368,14 +368,11 @@ class SmartFanApp(App):
         fan_state = False
         while True:
             if self.prediction.predict() and not fan_state:
-                print("Fan on from algorithm.")
                 fan_state = True
                 self.fan_power()
             if not self.prediction.predict() and fan_state:
-                print("Fan off from algorithm.")
                 fan_state = False
                 self.fan_power()
-            print("No action from prediction loop.")
             time.sleep(540)
             
     def update_inside_temp(self):

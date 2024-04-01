@@ -6,12 +6,10 @@ from kivy.uix.label import Label
 from kivy.core.window import Window
 from kivy.network.urlrequest import UrlRequest
 from smartfan.data.local_weather import Climate
-from smartfan.data.online_weather import Forecast
 from smartfan.prediction.prediction import Prediction
 import urllib.parse
 import urllib.request
 import threading
-import os
 import time
 import asyncio
 import socket
@@ -70,7 +68,7 @@ class SmartFanApp(App):
         #self.forecast = Forecast()
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
-        #self.prediction = Prediction(self.min_temp, self.max_temp, self.forecast, self.in_climate, self.out_climate)
+        self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate)
         #self.acctemp_array = self.forecast.getTemperatureFahrenheit()
         self.acctemp_array = [32, 30, 29, 28, 30, 31, 32, 29, 33, 25, 31, 33]
         self.acc_temp = self.acctemp_array[0]
@@ -78,8 +76,8 @@ class SmartFanApp(App):
         self.in_temp  = 0
         self.out_temp = 0
         
-        #t1 = threading.Thread(target=self.get_prediction)
-        #t1.start()
+        t1 = threading.Thread(target=self.get_prediction)
+        t1.start()
 
         # # Conn
         HOST = '192.168.1.161'    # The remote host
