@@ -2,7 +2,7 @@ from smartfan.data.local_weather import Climate
 from smartfan.data.online_weather import Forecast
 
 class Prediction():
-    def __init__(self, range_min: int, range_max: int, in_climate: Climate, out_climate: Climate, forecast: Forecast | None = None):
+    def __init__(self, range_min: int, range_max: int, in_climate: Climate, out_climate: Climate, forecast = None):
         self.range_min = range_min
         self.range_max = range_max
         self.in_climate = in_climate
