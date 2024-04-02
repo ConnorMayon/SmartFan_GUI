@@ -63,6 +63,7 @@ class SmartFanApp(App):
         self.hour = 5
         self.ten = 0
         self.min = 0
+        self.cd_timer = 0
         self.sched_list = []
         self.sched_label_list = []
         #self.forecast = Forecast()
@@ -84,9 +85,9 @@ class SmartFanApp(App):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.connect((HOST, PORT))
 
-        layout = GridLayout(cols=2, rows=6, row_force_default=True, col_force_default= True, col_default_width=350, row_default_height=50)
+        layout = GridLayout(cols=3, rows=6, row_force_default=True, col_force_default= True, col_default_width=350, row_default_height=50)
 
-        title_lable_layout = GridLayout(cols=2, col_force_default=True, col_default_width=305, row_force_default=True, row_default_height=40)
+        title_lable_layout = GridLayout(cols=3, col_force_default=True, col_default_width=305, row_force_default=True, row_default_height=40)
 
         range_label=Label(color=[0, 0, 0, 1], bold=True, text="Set Perferred Temperature Range")
 
@@ -95,6 +96,10 @@ class SmartFanApp(App):
         sched_label=Label(color=[0, 0, 0, 1], bold=True, text="Set Perferred Cooling Time")
 
         title_lable_layout.add_widget(sched_label)
+        
+        cooldown_label=Label(color=[0, 0, 0, 1], bold=True, text="Set Cooldown Time")
+
+        title_lable_layout.add_widget(cooldown_label)
 
         layout.add_widget(title_lable_layout)
         layout.add_widget(Label())  # Empty space
@@ -154,6 +159,20 @@ class SmartFanApp(App):
         time_layout.add_widget(min_dec_button)
 
         layout.add_widget(time_layout)
+        
+        cool_layout = GridLayout(rows=3, cols=1, col_force_default=True, col_default_width=70, row_default_height=60)
+        
+        cd_timer_inc_button = Button(text='Up', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_cd_timer_inc_press)
+
+        self.cd_timer_label = Label(color=[0, 0, 0, 1], text=str(self.cd_timer))
+
+        cd_timer_dec_button = Button(text='Down', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_cd_timer_dec_press)
+        
+        cool_layout.add_widget(cd_timer_inc_button)
+        cool_layout.add_widget(self.cd_timer_label)
+        cool_layout.add_widget(cd_timer_dec_button)
+        
+        layout.add_widget(cool_layout)
 
         button_row_layout=GridLayout(cols=3, rows=2, row_force_default=True, row_default_height=40, padding=[25, 0])
 
@@ -173,6 +192,9 @@ class SmartFanApp(App):
 
         button_row_layout.add_widget(update_button)
 
+        layout.add_widget(Label())  # Empty space
+        layout.add_widget(Label())  # Empty space
+        layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
@@ -201,6 +223,7 @@ class SmartFanApp(App):
         temperature_layout.add_widget(self.out_label)
         
         layout.add_widget(temperature_layout)
+        layout.add_widget(Label())  # Empty space
         
         it_thread = threading.Thread(target=self.update_inside_temp).start()
         ot_thread = threading.Thread(target=self.update_outside_temp).start()
@@ -228,7 +251,7 @@ class SmartFanApp(App):
             time.sleep(5)
             
             if self.user_pressed:
-                time.sleep(300)
+                time.sleep(self.cd_timer * 60)
                 self.user_pressed = False
 
     def make_request(self, instance):
@@ -241,6 +264,14 @@ class SmartFanApp(App):
 
     def on_failure(self, request, error):
         print("Request failed:", error)
+        
+    def on_cd_timer_dec_press(self, instance):
+        self.cd_timer -= 1
+        self.cd_timer_label.text = str(self.cd_timer)
+        
+    def on_cd_timer_inc_press(self, instance):
+        self.cd_timer += 1
+        self.cd_timer_label.text = str(self.cd_timer)
 
     def on_min_temp_dec_press(self, instance):
         self.min_temp -= 1
