@@ -75,9 +75,6 @@ class SmartFanApp(App):
         self.acc_temp = 30
         self.in_temp  = 0
         self.out_temp = 0
-        
-        t1 = threading.Thread(target=self.get_prediction)
-        t1.start()
 
         # # Conn
         HOST = '192.168.1.161'    # The remote host
@@ -210,6 +207,7 @@ class SmartFanApp(App):
         
         it_thread = threading.Thread(target=self.update_inside_temp).start()
         ot_thread = threading.Thread(target=self.update_outside_temp).start()
+        pred_thread = threading.Thread(target=self.get_prediction).start()
         #update_thread = threading.Thread(target=self.make_request).start()
 
         return layout
