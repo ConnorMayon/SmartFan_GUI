@@ -24,8 +24,8 @@ class Prediction():
         # get temperatures
         #in_temp = self.in_climate.getTempF()
         #out_temp = self.out_climate.getTempF()
-        in_temp = 67
-        out_temp = 42
+        in_temp = 90
+        out_temp = 60
 
         if self.forecast is not None:
             forecast_temp = self.forecast.getTemperatureFahrenheit()

@@ -388,7 +388,7 @@ class SmartFanApp(App):
                 fan_state = False
                 self.fan_power()
             
-            time.sleep(60)
+            time.sleep(10)
             
     def update_inside_temp(self):
         while True:
