@@ -372,6 +372,15 @@ class SmartFanApp(App):
     def get_prediction(self):
         fan_state = False
         while True:
+            if fan_state:
+                self.state_label.text = "True"
+                print(self.state_label.text)
+                print("True")
+            if not fan_state:
+                self.state_label.text = "False"
+                print(self.state_label.text)
+                print("False")
+                
             if self.prediction.predict() and not fan_state:
                 fan_state = True
                 self.fan_power()
@@ -379,9 +388,9 @@ class SmartFanApp(App):
                 fan_state = False
                 self.fan_power()
                 
-            if self.state_label and fan_state:
+            if fan_state:
                 self.state_label.text = "True"
-            if self.state_label and not fan_state:
+            if not fan_state:
                 self.state_label.text = "False"
             
             time.sleep(60)
