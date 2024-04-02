@@ -179,7 +179,7 @@ class SmartFanApp(App):
         layout.add_widget(Label())  # Empty space
         layout.add_widget(button_row_layout)
 
-        temperature_layout = GridLayout(rows=2, cols=4, col_force_default=True, col_default_width=70, row_default_height=60)
+        temperature_layout = GridLayout(rows=2, cols=3, col_force_default=True, col_default_width=70, row_default_height=60)
 
         acc_title = Label(color=[0, 0, 0, 1], text= "Forecast")
         self.acc_label = Label(color=[0, 0, 0, 1], text=str(self.acc_temp))
@@ -190,19 +190,14 @@ class SmartFanApp(App):
         out_title = Label(color=[0, 0, 0, 1], text= "Outside")
         self.out_label = Label(color=[0, 0, 0, 1], text="Connecting")
         
-        state_title = Label(color=[0, 0, 0, 1], text= "Fan state")
-        self.state_label = Label(color=[0, 0, 0, 1], text="Connecting")
-
         temperature_layout.add_widget(acc_title)
         temperature_layout.add_widget(in_title)
         temperature_layout.add_widget(out_title)
-        temperature_layout.add_widget(state_title)
-
+        
         temperature_layout.add_widget(self.acc_label)
         temperature_layout.add_widget(self.in_label)
         temperature_layout.add_widget(self.out_label)
-        temperature_layout.add_widget(self.state_label)
-
+        
         layout.add_widget(temperature_layout)
         
         it_thread = threading.Thread(target=self.update_inside_temp).start()
@@ -343,12 +338,9 @@ class SmartFanApp(App):
         app.root.clear_widgets()
         app.root.add_widget(app.build())
 
-    def fan_power(self):
-        self.state_label.text = "fun"
+    def fan_power(self, instance = None):
         output = bytes("power", 'utf-8')
-        self.state_label.text = "byt"
         self.server_socket.sendall(output)
-        self.state_label.text = "snt"
    
     def send_message(self):
         # Base URL of the server
@@ -374,27 +366,14 @@ class SmartFanApp(App):
         fan_state = False
         i = 0
         while True:
-            #pred_result = self.prediction.predict()
-            self.state_label.text = str(i)
-            i = i + 1
-            if self.prediction.predict() and not fan_state:
-                self.state_label.text = "pred"
+            pred_result = self.prediction.predict()
+            if pred_result and not fan_state:
                 fan_state = True
-                self.state_label.text = "state"
                 self.fan_power()
-                self.state_label.text = "pow"
-            if not self.prediction.predict() and fan_state:
+            if not pred_result and fan_state:
                 fan_state = False
                 self.fan_power()
                 
-            self.state_label.text = str(i)
-            i = i + 1
-            '''
-            if fan_state:
-                self.state_label.text = "True"
-            if not fan_state:
-                self.state_label.text = "False"
-            '''
             time.sleep(5)
             
     def update_inside_temp(self):
