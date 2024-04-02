@@ -98,6 +98,7 @@ class SmartFanApp(App):
         title_lable_layout.add_widget(sched_label)
         
         layout.add_widget(title_lable_layout)
+        layout.add_widget(Label()) # Empty space
 
         temp_layout = GridLayout(rows=3, cols=2, col_force_default=True, col_default_width=70, row_force_default= True, row_default_height=60, padding=[70, 0])
 
@@ -210,7 +211,6 @@ class SmartFanApp(App):
         temperature_layout.add_widget(self.out_label)
         
         layout.add_widget(temperature_layout)
-        layout.add_widget(Label())  # Empty space
         
         it_thread = threading.Thread(target=self.update_inside_temp).start()
         ot_thread = threading.Thread(target=self.update_outside_temp).start()
