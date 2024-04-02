@@ -22,8 +22,10 @@ class Prediction():
         Returns boolean to representing whether fan should be turned on or off
         """
         # get temperatures
-        in_temp = self.in_climate.getTempF()
-        out_temp = self.out_climate.getTempF()
+        #in_temp = self.in_climate.getTempF()
+        #out_temp = self.out_climate.getTempF()
+        in_temp = 67
+        out_temp = 42
 
         if self.forecast is not None:
             forecast_temp = self.forecast.getTemperatureFahrenheit()

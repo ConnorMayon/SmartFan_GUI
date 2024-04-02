@@ -373,7 +373,7 @@ class SmartFanApp(App):
             if not self.prediction.predict() and fan_state:
                 fan_state = False
                 self.fan_power()
-            time.sleep(540)
+            time.sleep(60)
             
     def update_inside_temp(self):
         while True:
