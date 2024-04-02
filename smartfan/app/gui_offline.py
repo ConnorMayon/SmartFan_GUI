@@ -199,10 +199,12 @@ class SmartFanApp(App):
         temperature_layout.add_widget(acc_title)
         temperature_layout.add_widget(in_title)
         temperature_layout.add_widget(out_title)
+        temperature_layout.add_widget(state_title)
 
         temperature_layout.add_widget(self.acc_label)
         temperature_layout.add_widget(self.in_label)
         temperature_layout.add_widget(self.out_label)
+        temperature_layout.add_widget(self.state_label)
 
         layout.add_widget(temperature_layout)
         
