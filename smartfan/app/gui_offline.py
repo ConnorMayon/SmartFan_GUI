@@ -372,6 +372,14 @@ class SmartFanApp(App):
         f = open("fan_state.txt", "a")
         while True:
             f.write("Fan state: ")
+                
+            if self.prediction.predict() and not fan_state:
+                fan_state = True
+                self.fan_power()
+            if not self.prediction.predict() and fan_state:
+                fan_state = False
+                self.fan_power()
+                
             if fan_state:
                 self.state_label.text = "True"
                 f.write(self.state_label.text)
@@ -380,13 +388,6 @@ class SmartFanApp(App):
                 self.state_label.text = "False"
                 f.write(self.state_label.text)
                 f.write("False")
-                
-            if self.prediction.predict() and not fan_state:
-                fan_state = True
-                self.fan_power()
-            if not self.prediction.predict() and fan_state:
-                fan_state = False
-                self.fan_power()
             
             time.sleep(60)
             
