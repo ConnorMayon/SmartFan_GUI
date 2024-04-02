@@ -75,6 +75,7 @@ class SmartFanApp(App):
         self.acc_temp = 30
         self.in_temp  = 0
         self.out_temp = 0
+        self.fan_state = False
 
         # # Conn
         HOST = '192.168.1.161'    # The remote host
@@ -210,17 +211,15 @@ class SmartFanApp(App):
     def fan_power(self, instance = None):
         output = bytes("power", 'utf-8')
         self.server_socket.sendall(output)
+        self.fan_state = not self.fan_state
  
     def get_prediction(self):
-        fan_state = False
         i = 0
         while True:
             pred_result = self.prediction.predict()
-            if pred_result and not fan_state:
-                fan_state = True
+            if pred_result and not self.fan_state:
                 self.fan_power()
-            if not pred_result and fan_state:
-                fan_state = False
+            if not pred_result and self.fan_state:
                 self.fan_power()
                 
             time.sleep(5)
