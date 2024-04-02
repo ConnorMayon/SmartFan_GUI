@@ -182,7 +182,7 @@ class SmartFanApp(App):
         layout.add_widget(Label())  # Empty space
         layout.add_widget(button_row_layout)
 
-        temperature_layout = GridLayout(rows=2, cols=3, col_force_default=True, col_default_width=70, row_default_height=60)
+        temperature_layout = GridLayout(rows=2, cols=4, col_force_default=True, col_default_width=70, row_default_height=60)
 
         acc_title = Label(color=[0, 0, 0, 1], text= "Forecast")
         self.acc_label = Label(color=[0, 0, 0, 1], text=str(self.acc_temp))
@@ -192,6 +192,9 @@ class SmartFanApp(App):
 
         out_title = Label(color=[0, 0, 0, 1], text= "Outside")
         self.out_label = Label(color=[0, 0, 0, 1], text="Connecting")
+        
+        state_title = Label(color=[0, 0, 0, 1], text= "Fan state")
+        self.state_label = Label(color=[0, 0, 0, 1], text="Connecting")
 
         temperature_layout.add_widget(acc_title)
         temperature_layout.add_widget(in_title)
@@ -373,6 +376,10 @@ class SmartFanApp(App):
             if not self.prediction.predict() and fan_state:
                 fan_state = False
                 self.fan_power()
+                
+            if self.state_label:
+                self.state_label.text = str(fan_state)
+            
             time.sleep(60)
             
     def update_inside_temp(self):
