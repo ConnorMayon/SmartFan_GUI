@@ -379,8 +379,10 @@ class SmartFanApp(App):
                 fan_state = False
                 self.fan_power()
                 
-            if self.state_label:
-                self.state_label.text = str(fan_state)
+            if self.state_label and fan_state:
+                self.state_label.text = "True"
+            if self.state_label and not fan_state:
+                self.state_label.text = "False"
             
             time.sleep(60)
             
