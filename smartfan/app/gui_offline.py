@@ -85,7 +85,7 @@ class SmartFanApp(App):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.connect((HOST, PORT))
 
-        layout = GridLayout(cols=3, rows=6, row_force_default=True, col_force_default= True, col_default_width=350, row_default_height=50)
+        layout = GridLayout(cols=2, rows=6, row_force_default=True, col_force_default= True, col_default_width=350, row_default_height=50)
 
         title_lable_layout = GridLayout(cols=3, col_force_default=True, col_default_width=305, row_force_default=True, row_default_height=40)
 
@@ -93,16 +93,11 @@ class SmartFanApp(App):
 
         title_lable_layout.add_widget(range_label)
 
-        sched_label=Label(color=[0, 0, 0, 1], bold=True, text="Set Perferred Cooling Time")
+        sched_label=Label(color=[0, 0, 0, 1], bold=True, text="Set Perferred Cooling Time / Cooldown Timer")
 
         title_lable_layout.add_widget(sched_label)
         
-        cooldown_label=Label(color=[0, 0, 0, 1], bold=True, text="Set Cooldown Time")
-
-        title_lable_layout.add_widget(cooldown_label)
-
         layout.add_widget(title_lable_layout)
-        layout.add_widget(Label())  # Empty space
 
         temp_layout = GridLayout(rows=3, cols=2, col_force_default=True, col_default_width=70, row_force_default= True, row_default_height=60, padding=[70, 0])
 
@@ -127,7 +122,7 @@ class SmartFanApp(App):
 
         layout.add_widget(temp_layout)
 
-        time_layout = GridLayout(rows=3, cols=3, col_force_default=True, col_default_width=70, row_default_height=60)
+        time_layout = GridLayout(rows=3, cols=4, col_force_default=True, col_default_width=70, row_default_height=60)
 
         hour_inc_button = Button(text='Up', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_hour_inc_press)
 
@@ -146,33 +141,28 @@ class SmartFanApp(App):
         self.min_label = Label(color=[0, 0, 0, 1], text=str(self.min))
 
         min_dec_button = Button(text='Down', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_min_dec_press)
-
-        #These are formatted so that the inc btns are the top row, labels are middle, and dec btns are bottom.
-        time_layout.add_widget(hour_inc_button)
-        time_layout.add_widget(ten_inc_button)
-        time_layout.add_widget(min_inc_button)
-        time_layout.add_widget(self.hour_label)
-        time_layout.add_widget(self.ten_label)
-        time_layout.add_widget(self.min_label)
-        time_layout.add_widget(hour_dec_button)
-        time_layout.add_widget(ten_dec_button)
-        time_layout.add_widget(min_dec_button)
-
-        layout.add_widget(time_layout)
-        
-        cool_layout = GridLayout(rows=3, cols=1, col_force_default=True, col_default_width=70, row_default_height=60)
         
         cd_timer_inc_button = Button(text='Up', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_cd_timer_inc_press)
 
         self.cd_timer_label = Label(color=[0, 0, 0, 1], text=str(self.cd_timer))
 
         cd_timer_dec_button = Button(text='Down', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_cd_timer_dec_press)
-        
-        cool_layout.add_widget(cd_timer_inc_button)
-        cool_layout.add_widget(self.cd_timer_label)
-        cool_layout.add_widget(cd_timer_dec_button)
-        
-        layout.add_widget(cool_layout)
+
+        #These are formatted so that the inc btns are the top row, labels are middle, and dec btns are bottom.
+        time_layout.add_widget(hour_inc_button)
+        time_layout.add_widget(ten_inc_button)
+        time_layout.add_widget(min_inc_button)
+        time_layout.add_widget(cd_timer_inc_button)
+        time_layout.add_widget(self.hour_label)
+        time_layout.add_widget(self.ten_label)
+        time_layout.add_widget(self.min_label)
+        time_layout.add_widget(self.cd_timer_label)
+        time_layout.add_widget(hour_dec_button)
+        time_layout.add_widget(ten_dec_button)
+        time_layout.add_widget(min_dec_button)
+        time_layout.add_widget(cd_timer_dec_button)
+
+        layout.add_widget(time_layout)
 
         button_row_layout=GridLayout(cols=3, rows=2, row_force_default=True, row_default_height=40, padding=[25, 0])
 
@@ -192,9 +182,6 @@ class SmartFanApp(App):
 
         button_row_layout.add_widget(update_button)
 
-        layout.add_widget(Label())  # Empty space
-        layout.add_widget(Label())  # Empty space
-        layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
         layout.add_widget(Label())  # Empty space
