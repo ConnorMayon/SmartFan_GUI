@@ -68,9 +68,9 @@ class SmartFanApp(App):
         #self.forecast = Forecast()
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
-        self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate)
-        #self.acctemp_array = self.forecast.getTemperatureFahrenheit()
         self.acctemp_array = [32, 30, 29, 28, 30, 31, 32, 29, 33, 25, 31, 33]
+        self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, self.acctemp_array)
+        #self.acctemp_array = self.forecast.getTemperatureFahrenheit()
         self.acc_temp = self.acctemp_array[0]
         self.acc_temp = 30
         self.in_temp  = 0
