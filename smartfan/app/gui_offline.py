@@ -87,7 +87,7 @@ class SmartFanApp(App):
 
         layout = GridLayout(cols=2, rows=6, row_force_default=True, col_force_default= True, col_default_width=350, row_default_height=50)
 
-        title_lable_layout = GridLayout(cols=3, col_force_default=True, col_default_width=305, row_force_default=True, row_default_height=40)
+        title_lable_layout = GridLayout(cols=2, col_force_default=True, col_default_width=305, row_force_default=True, row_default_height=40)
 
         range_label=Label(color=[0, 0, 0, 1], bold=True, text="Set Perferred Temperature Range")
 
