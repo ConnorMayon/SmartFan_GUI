@@ -384,7 +384,7 @@ class SmartFanApp(App):
             if not fan_state:
                 self.state_label.text = "False"
             
-            time.sleep(10)
+            time.sleep(5)
             
     def update_inside_temp(self):
         while True:
