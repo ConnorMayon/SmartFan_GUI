@@ -76,6 +76,7 @@ class SmartFanApp(App):
         self.in_temp  = 0
         self.out_temp = 0
         self.fan_state = False
+        self.user_pressed = False
 
         # # Conn
         HOST = '192.168.1.161'    # The remote host
@@ -212,6 +213,8 @@ class SmartFanApp(App):
         output = bytes("power", 'utf-8')
         self.server_socket.sendall(output)
         self.fan_state = not self.fan_state
+        if instance != None:
+            self.user_pressed = True
  
     def get_prediction(self):
         i = 0
@@ -223,6 +226,10 @@ class SmartFanApp(App):
                 self.fan_power()
                 
             time.sleep(5)
+            
+            if self.user_pressed:
+                time.sleep(300)
+                self.user_pressed = False
 
     def make_request(self, instance):
         # Make a GET request
