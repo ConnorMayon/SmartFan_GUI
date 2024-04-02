@@ -22,10 +22,10 @@ class Prediction():
         Returns boolean to representing whether fan should be turned on or off
         """
         # get temperatures
-        #in_temp = self.in_climate.getTempF()
-        #out_temp = self.out_climate.getTempF()
-        in_temp = 90
-        out_temp = 60
+        in_temp = self.in_climate.getTempF()
+        out_temp = self.out_climate.getTempF()
+        #in_temp = 70
+        #out_temp = 47
 
         if self.forecast is not None:
             forecast_temp = self.forecast.getTemperatureFahrenheit()
@@ -52,9 +52,9 @@ class Prediction():
 
         # if temp not in range, activate iff outside temperature is closer to desired range
         if in_temp not in range(self.range_min, self.range_max):
-            if in_temp > self.range_max and out_temp < in_temp:
+            if in_temp > self.range_max and out_temp < in_temp - 1:
                 return True
-            elif in_temp < self.range_min and out_temp > in_temp:
+            elif in_temp < self.range_min and out_temp > in_temp + 1:
                 return True
             else:
                 return False

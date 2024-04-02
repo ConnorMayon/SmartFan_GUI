@@ -343,9 +343,12 @@ class SmartFanApp(App):
         app.root.clear_widgets()
         app.root.add_widget(app.build())
 
-    def fan_power(self, instance):
+    def fan_power(self):
+        self.state_label.text = "fun"
         output = bytes("power", 'utf-8')
+        self.state_label.text = "byt"
         self.server_socket.sendall(output)
+        self.state_label.text = "snt"
    
     def send_message(self):
         # Base URL of the server
@@ -369,21 +372,29 @@ class SmartFanApp(App):
 
     def get_prediction(self):
         fan_state = False
-  
+        i = 0
         while True:
-            pred_result = self.prediction.predict()
-            if pred_result and not fan_state:
+            #pred_result = self.prediction.predict()
+            self.state_label.text = str(i)
+            i = i + 1
+            if self.prediction.predict() and not fan_state:
+                self.state_label.text = "pred"
                 fan_state = True
+                self.state_label.text = "state"
                 self.fan_power()
-            if not pred_result and fan_state:
+                self.state_label.text = "pow"
+            if not self.prediction.predict() and fan_state:
                 fan_state = False
                 self.fan_power()
                 
+            self.state_label.text = str(i)
+            i = i + 1
+            '''
             if fan_state:
                 self.state_label.text = "True"
             if not fan_state:
                 self.state_label.text = "False"
-            
+            '''
             time.sleep(5)
             
     def update_inside_temp(self):
