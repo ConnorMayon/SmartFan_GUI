@@ -49,7 +49,7 @@ class SmartFanApp(App):
         #self.forecast = Forecast()
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
-        self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, True)
+        self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, False)
         self.acc_temp = 0
         self.in_temp = 0
         self.out_temp = 0
