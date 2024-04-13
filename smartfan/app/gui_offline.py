@@ -378,21 +378,10 @@ class SmartFanApp(App):
         with urllib.request.urlopen(req) as response:
             response = response.read().decode('utf-8')
             
-    def get_prediction(self):
-        fan_state = False
-        while True:
-            if self.prediction.predict() and not fan_state:
-                fan_state = True
-                self.fan_power()
-            if not self.prediction.predict() and fan_state:
-                fan_state = False
-                self.fan_power()
-            time.sleep(540)
-            
     def update_inside_temp(self):
         while True:
             asyncio.run(self.in_climate.sensorClient())
-            self.in_temp  = self.in_climate.getTempF()
+            self.in_temp = self.in_climate.getTempF()
             if self.in_label:
                 self.in_label.text = str(self.in_temp)
             time.sleep(1)
