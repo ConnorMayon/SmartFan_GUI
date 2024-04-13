@@ -24,16 +24,9 @@ def define_argparser(command_parser: _SubParsersAction):
     Define `run` subcommand.
     """
     p = command_parser.add_parser(
-        'run_offline', help='run smartfan app')
+        'run', help='run smartfan app')
 
     p.set_defaults(handler=lambda args: run())
-
-
-class SchedulingPage(GridLayout):
-    def __init__(self, switch_home_callback, sched_list, **kwargs):
-        super().__init__(**kwargs)
-        self.min_temp_label = None
-        self.max_temp_label = None
 
 class SmartFanApp(App):
     Window.clearcolor = (1, 1, 1, 1)
@@ -45,8 +38,8 @@ class SmartFanApp(App):
     def build(self):
         self.page = 0
         self.display_on = True
-        self.min_temp = 65
-        self.max_temp = 85
+        self.min_temp = 64
+        self.max_temp = 84
         self.hour = 5
         self.ten = 0
         self.min = 0
@@ -57,12 +50,12 @@ class SmartFanApp(App):
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
         self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, False)
         self.acc_temp = 0
-        self.in_temp  = 0
+        self.in_temp = 0
         self.out_temp = 0
         self.fan_state = False
         self.user_pressed = False
 
-        # Connect to fan pi
+        # # Conn
         HOST = '192.168.1.161'    # The remote host
         #HOST = '10.3.62.253'
         PORT = 50007
@@ -71,11 +64,9 @@ class SmartFanApp(App):
         self.server_socket.connect((HOST, PORT))
 
         Clock.schedule_once(self.make_request, 0)
-        #Clock.schedule_once(self.update_acc_weather, 0)
 
         #repeated every 10 minutes
         Clock.schedule_interval(self.make_request, 1)
-        #Clock.schedule_interval(self.update_acc_weather, 3600)
 
         layout = FloatLayout()
 
@@ -156,7 +147,7 @@ class SmartFanApp(App):
         out_title = Label(color=[0, 0, 0, 1], text="Outside", pos=(485, 175), size_hint=(None, None), size=(70, 60))
         layout.add_widget(out_title)
 
-        self.acc_label = Label(color=[0, 0, 0, 1], text="No internet", pos=(285, 125), size_hint=(None, None), size=(70, 60))
+        self.acc_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(285, 125), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.acc_label)
 
         self.in_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(385, 125), size_hint=(None, None), size=(70, 60))
@@ -184,14 +175,14 @@ class SmartFanApp(App):
 
         return layout
     
- 
-    def fan_power(self, instance = None):
+    
+    def fan_power(self, instance):
         output = bytes("power", 'utf-8')
         self.server_socket.sendall(output)
         self.fan_state = not self.fan_state
         if instance != None:
             self.user_pressed = True
- 
+    
     def get_prediction(self):
         while True:
             pred_result = self.prediction.predict()
@@ -209,50 +200,50 @@ class SmartFanApp(App):
 
     def make_request(self, instance):
         # Make a GET request
-        # url = 'http://10.3.62.239:8000/data'
+        #url = 'http://10.3.62.253:8000/data'
         url = 'http://192.168.1.18:8000/data'
 
-        self.request = UrlRequest(url, on_success=self.on_success, on_failure=self.on_failure)
+        self.request = UrlRequest(url, on_success=self.on_request_success, on_failure=self.on_request_failure)
         
     def on_cd_timer_dec_press(self, instance):
         self.cd_timer -= 1
         if self.cd_timer == 0:
-            self.cd_timer_label.text = "Off"
+            self.cd_timer_label.text = "Manual"
         elif self.cd_timer == -1:
             self.cd_timer = 0
         else:
             self.cd_timer_label.text = str(self.cd_timer)
-        
+
     def on_cd_timer_inc_press(self, instance):
         self.cd_timer += 1
         self.cd_timer_label.text = str(self.cd_timer)
 
     def on_min_temp_dec_press(self, instance):
         self.min_temp -= 1
-        self.prediction.update_range_min(self.min_temp)
+        #self.prediction.update_range_min(self.min_temp)
         self.update_temp_labels()
         self.send_message()
 
     def on_min_temp_inc_press(self, instance):
         if self.min_temp < self.max_temp:
             self.min_temp += 1
-            self.prediction.update_range_min(self.min_temp)
+            #self.prediction.update_range_min(self.min_temp)
             self.update_temp_labels()
             self.send_message()
 
     def on_max_temp_dec_press(self, instance):
         if self.min_temp < self.max_temp:
             self.max_temp -= 1
-            self.prediction.update_range_max(self.max_temp)
+            #self.prediction.update_range_max(self.max_temp)
             self.update_temp_labels()
             self.send_message()
 
     def on_max_temp_inc_press(self, instance):
         self.max_temp += 1
-        self.prediction.update_range_max(self.max_temp)
+        #self.prediction.update_range_max(self.max_temp)
         self.update_temp_labels()
         self.send_message()
-    
+        
     def on_hour_dec_press(self, instance):
         self.hour -= 1
         if self.hour == -1:
@@ -303,30 +294,24 @@ class SmartFanApp(App):
         self.web_update_temp(result)
         self.web_update_time(result)
 
-    #needs update after changes
     def save_time(self, instance):
-        # Create a label with the formatted time
-        time_value=f"{self.hour:02}:{self.ten}{self.min}"
+        time_value = f"{self.hour:02}:{self.ten}{self.min}"
+        if len(self.sched_label_list) >= 5:
+            # Replace the oldest label
+            oldest_label = self.sched_label_list.pop(0)
+            self.sched_list.pop(0)
+            oldest_label.text = time_value
+            self.sched_label_list.append(oldest_label)
+        else:
+            # Add a new label
+            new_label = Label(text=time_value, color=[0, 0, 0, 1], size_hint=(None, None), size=(305, 40), pos=(500, 390 - len(self.sched_list) * 30))
+            self.root.add_widget(new_label)
+            self.sched_label_list.append(new_label)
         self.sched_list.append(time_value)
-        #self.send_message('saveTime', time_value)
-        # Add the label to the scheduling page
-        self.switch_page(instance)
-        self.root.children[0].add_widget(Label(text=time_value, color=[0, 0, 0, 1]))
-
-    #needs update after changes
-    def switch_page(self, instance):
-        self.root.clear_widgets()
-        self.root.add_widget(SchedulingPage(sched_list=self.sched_list, switch_home_callback=self.switch_home))
-
-    #needs update after changes
-    def switch_home(self, instance):
-        app = App.get_running_app()
-        app.root.clear_widgets()
-        app.root.add_widget(app.build())
    
     def send_message(self):
         # Base URL of the server
-        # url = 'http://10.3.62.239:8000/log'
+        #url = 'http://10.3.62.253:8000/log'
         url = 'http://192.168.1.18:8000/log'
 
         # Construct the query string
@@ -343,23 +328,7 @@ class SmartFanApp(App):
         # Send the request
         with urllib.request.urlopen(req) as response:
             response = response.read().decode('utf-8')
-            
-    def update_inside_temp(self):
-        while True:
-            asyncio.run(self.in_climate.sensorClient())
-            self.in_temp = self.in_climate.getTempF()
-            if self.in_label:
-                self.in_label.text = str(self.in_temp)
-            time.sleep(1)
-            
-    def update_outside_temp(self):
-        while True:
-            asyncio.run(self.out_climate.sensorClient())
-            self.out_temp = self.out_climate.getTempF()
-            if self.out_label:
-                self.out_label.text = str(self.out_temp)
-            time.sleep(1)
-            
+
     def update_temp_labels(self):
         if self.min_temp_label:
             self.min_temp_label.text = str(self.min_temp)
@@ -373,6 +342,22 @@ class SmartFanApp(App):
             self.ten_label.text = str(self.ten)
         if self.min_label:
             self.min_label.text = str(self.min)
+                        
+    def update_inside_temp(self):
+        while True:
+            asyncio.run(self.in_climate.sensorClient())
+            self.in_temp  = self.in_climate.getTempF()
+            if self.in_label:
+                self.in_label.text = str(self.in_temp)
+            time.sleep(1)
+            
+    def update_outside_temp(self):
+        while True:
+            asyncio.run(self.out_climate.sensorClient())
+            self.out_temp = self.out_climate.getTempF()
+            if self.out_label:
+                self.out_label.text = str(self.out_temp)
+            time.sleep(1)
             
     def web_update_temp(self, results):
         self.min_temp = results.get('minTempValue')
@@ -384,15 +369,19 @@ class SmartFanApp(App):
         self.ten = results.get('tenMinutesValue')
         self.min = results.get('minutesValue')
         self.update_time_labels()
-            
 
 
 def run():
-    #os.popen('xset dpms 15 15 15')  # Set screen blanking to 15 seconds
+    #os.popen('xset dpms 30 30 30')  # Set screen blanking to 15 seconds
     
     # Set window to full screen
+    # PUT THESE BACK BEFORE MERGE
     Config.set('graphics', 'fullscreen', 'auto')
     Config.set('graphics', 'window_state', 'maximized')
     Config.write()
+    #Config.set('graphics', 'fullscreen', '0')
+    #Config.set('graphics', 'window_state', 'normal')
+    #Config.write()
+
     
     SmartFanApp().run()
