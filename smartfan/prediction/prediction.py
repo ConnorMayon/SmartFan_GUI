@@ -1,15 +1,22 @@
+from xmlrpc.client import Boolean
 from smartfan.data.local_weather import Climate
 from smartfan.data.online_weather import Forecast
 from typing import List
 
 class Prediction():
-    def __init__(self, range_min: int, range_max: int, in_climate: Climate, out_climate: Climate, forecast_temp_arr: List[int]):
+    def __init__(self, range_min: int, range_max: int, in_climate: Climate, out_climate: Climate, is_online: Boolean):
         self.range_min = range_min
         self.range_max = range_max
         self.in_climate = in_climate
         self.out_climate = out_climate
-        self.forecast_temp_arr = forecast_temp_arr
-        #self.forecast = forecast
+        self.is_online = is_online
+        self.forecast_temp_arr
+        if self.is_online: self.forecast = Forecast()
+        
+    def get_accuweather_temps(self):
+        if not self.is_online: return None
+        self.forecast_temp_arr = self.forecast.getTemperatureFahrenheit()
+        return self.forecast_temp_arr
 
     def update_range_min(self, new_min):
         self.range_min = new_min

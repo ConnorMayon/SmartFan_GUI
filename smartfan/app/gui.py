@@ -47,13 +47,14 @@ class SmartFanApp(App):
         self.sched_list = []
         self.sched_label_list = []
         self.forecast = Forecast()
-        self.acctemp_array = self.forecast.getTemperatureFahrenheit()
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
-        self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, self.acctemp_array)
-        self.acc_temp = self.acctemp_array[0]
+        self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, True)
+        self.acc_temp = 0
         self.in_temp = 0
         self.out_temp = 0
+        self.fan_state = False
+        self.user_pressed = False
 
         # # Conn
         HOST = '192.168.1.161'    # The remote host
@@ -65,9 +66,11 @@ class SmartFanApp(App):
 
 
         Clock.schedule_once(self.make_request, 0)
+        Clock.schedule_once(self.update_acc_weather, 0)
 
         #repeated every 10 minutes
         Clock.schedule_interval(self.make_request, 1)
+        Clock.schedule_interval(self.update_acc_weather, 3600)
 
         layout = FloatLayout()
 
@@ -142,7 +145,7 @@ class SmartFanApp(App):
         out_title = Label(color=[0, 0, 0, 1], text="Outside", pos=(485, 175), size_hint=(None, None), size=(70, 60))
         layout.add_widget(out_title)
 
-        self.acc_label = Label(color=[0, 0, 0, 1], text=str(round(self.acc_temp, 2)), pos=(285, 125), size_hint=(None, None), size=(70, 60))
+        self.acc_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(285, 125), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.acc_label)
 
         self.in_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(385, 125), size_hint=(None, None), size=(70, 60))
@@ -321,6 +324,11 @@ class SmartFanApp(App):
         with urllib.request.urlopen(req) as response:
             response = response.read().decode('utf-8')
             
+    def update_acc_weather(self):
+        acctemp_array = self.prediction.get_accuweather_temps
+        self.acc_temp = self.acctemp_array[0]
+        self.acc_label.text = str(round(self.acc_temp, 2))
+
     def update_temp_labels(self):
         if self.min_temp_label:
             self.min_temp_label.text = str(self.min_temp)
