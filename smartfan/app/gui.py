@@ -98,13 +98,13 @@ class SmartFanApp(App):
         max_temp_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(170, 370), size_hint=(None, None), size=(70, 60), on_press=self.on_max_temp_dec_press)
         layout.add_widget(max_temp_dec_button)
 
-        hour_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(290, 480), size_hint=(None, None), size=(70, 60), on_press=self.hour_inc_press)
+        hour_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(290, 480), size_hint=(None, None), size=(70, 60), on_press=self.on_hour_inc_press)
         layout.add_widget(hour_inc_button)
 
-        ten_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(365, 480), size_hint=(None, None), size=(70, 60), on_press=self.ten_inc_press)
+        ten_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(365, 480), size_hint=(None, None), size=(70, 60), on_press=self.on_ten_inc_press)
         layout.add_widget(ten_inc_button)
 
-        min_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(440, 480), size_hint=(None, None), size=(70, 60), on_press=self.min_inc_press)
+        min_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(440, 480), size_hint=(None, None), size=(70, 60), on_press=self.on_min_inc_press)
         layout.add_widget(min_inc_button)
 
         self.hour_label = Label(color=[0, 0, 0, 1], text=str(self.hour), pos=(290, 425), size_hint=(None, None), size=(70, 60))
@@ -116,13 +116,13 @@ class SmartFanApp(App):
         self.min_label = Label(color=[0, 0, 0, 1], text=str(self.min), pos=(440, 425), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.min_label)
 
-        hour_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(290, 370), size_hint=(None, None), size=(70, 60), on_press=self.hour_dec_press)
+        hour_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(290, 370), size_hint=(None, None), size=(70, 60), on_press=self.on_hour_dec_press)
         layout.add_widget(hour_dec_button)
 
-        ten_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(365, 370), size_hint=(None, None), size=(70, 60), on_press=self.ten_dec_press)
+        ten_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(365, 370), size_hint=(None, None), size=(70, 60), on_press=self.on_ten_dec_press)
         layout.add_widget(ten_dec_button)
 
-        min_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(440, 370), size_hint=(None, None), size=(70, 60), on_press=self.min_dec_press)
+        min_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(440, 370), size_hint=(None, None), size=(70, 60), on_press=self.on_min_dec_press)
         layout.add_widget(min_dec_button)
         
         save_time_button = Button(text='Save Time', size_hint=(None, None), pos=(65, 285), background_color=[0.075, 0.71, 0.918, 1], size=(200, 60))
