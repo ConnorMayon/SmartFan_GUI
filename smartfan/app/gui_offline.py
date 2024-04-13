@@ -64,7 +64,7 @@ class SmartFanApp(App):
         self.hour = 5
         self.ten = 0
         self.min = 0
-        self.cd_timer = 0
+        self.cd_timer = 1
         self.sched_list = []
         self.sched_label_list = []
         #self.forecast = Forecast()
@@ -72,15 +72,13 @@ class SmartFanApp(App):
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
         self.acctemp_array = [32, 30, 29, 28, 30, 31, 32, 29, 33, 25, 31, 33]
         self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, self.acctemp_array)
-        #self.acctemp_array = self.forecast.getTemperatureFahrenheit()
         self.acc_temp = self.acctemp_array[0]
-        self.acc_temp = 30
         self.in_temp  = 0
         self.out_temp = 0
         self.fan_state = False
         self.user_pressed = False
 
-        # # Conn
+        # Connect to fan pi
         HOST = '192.168.1.161'    # The remote host
         PORT = 50007              # The same port as used by the server
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -202,6 +200,7 @@ class SmartFanApp(App):
 
         out_title = Label(color=[0, 0, 0, 1], text= "Outside")
         self.out_label = Label(color=[0, 0, 0, 1], text="Connecting")
+        
         temperature_layout.add_widget(acc_title)
         temperature_layout.add_widget(in_title)
         temperature_layout.add_widget(out_title)
@@ -218,6 +217,7 @@ class SmartFanApp(App):
         #update_thread = threading.Thread(target=self.make_request).start()
 
         return layout
+    
  
     def fan_power(self, instance = None):
         output = bytes("power", 'utf-8')
