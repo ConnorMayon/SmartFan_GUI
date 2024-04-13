@@ -1,6 +1,7 @@
 import sys
 from argparse import ArgumentParser
 from smartfan.app.gui import define_argparser as def_run
+from smartfan.app.gui_offline import define_argparser as def_run_offline
 
 
 def define_argparser() -> ArgumentParser:
@@ -14,6 +15,7 @@ def define_argparser() -> ArgumentParser:
         required=True)
 
     def_run(command_parser)
+    def_run_offline(command_parser)
 
     return cli_parser
 

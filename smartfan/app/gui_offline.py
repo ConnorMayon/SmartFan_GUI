@@ -6,7 +6,6 @@ from kivy.uix.label import Label
 from kivy.core.window import Window
 from kivy.network.urlrequest import UrlRequest
 from smartfan.data.local_weather import Climate
-from smartfan.data.online_weather import Forecast
 from smartfan.prediction.prediction import Prediction
 import urllib.parse
 import urllib.request
@@ -22,7 +21,7 @@ def define_argparser(command_parser: _SubParsersAction):
     Define `run` subcommand.
     """
     p = command_parser.add_parser(
-        'run', help='run smartfan app')
+        'run_offline', help='run smartfan app')
 
     p.set_defaults(handler=lambda args: run())
 
@@ -65,21 +64,21 @@ class SmartFanApp(App):
         self.hour = 5
         self.ten = 0
         self.min = 0
+        self.cd_timer = 0
         self.sched_list = []
         self.sched_label_list = []
         #self.forecast = Forecast()
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
-        #self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, self.forecast)
-        #self.acctemp_array = self.forecast.getTemperatureFahrenheit()
         self.acctemp_array = [32, 30, 29, 28, 30, 31, 32, 29, 33, 25, 31, 33]
+        self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, self.acctemp_array)
+        #self.acctemp_array = self.forecast.getTemperatureFahrenheit()
         self.acc_temp = self.acctemp_array[0]
         self.acc_temp = 30
-        self.in_temp = 0
+        self.in_temp  = 0
         self.out_temp = 0
-        
-        t1 = threading.Thread(target=self.get_prediction)
-        t1.start()
+        self.fan_state = False
+        self.user_pressed = False
 
         # # Conn
         HOST = '192.168.1.161'    # The remote host
@@ -95,12 +94,12 @@ class SmartFanApp(App):
 
         title_lable_layout.add_widget(range_label)
 
-        sched_label=Label(color=[0, 0, 0, 1], bold=True, text="Set Perferred Cooling Time")
+        sched_label=Label(color=[0, 0, 0, 1], bold=True, text="Set Perferred Cooling Time / Cooldown Timer")
 
         title_lable_layout.add_widget(sched_label)
-
+        
         layout.add_widget(title_lable_layout)
-        layout.add_widget(Label())  # Empty space
+        layout.add_widget(Label()) # Empty space
 
         temp_layout = GridLayout(rows=3, cols=2, col_force_default=True, col_default_width=70, row_force_default= True, row_default_height=60, padding=[70, 0])
 
@@ -125,36 +124,45 @@ class SmartFanApp(App):
 
         layout.add_widget(temp_layout)
 
-        time_layout = GridLayout(rows=3, cols=3, col_force_default=True, col_default_width=70, row_default_height=60)
+        time_layout = GridLayout(rows=3, cols=4, col_force_default=True, col_default_width=70, row_default_height=60)
 
-        hour_inc_button = Button(text='Up', background_color= [0.075, 0.71, 0.918, 1], on_press=self.hour_inc_press)
+        hour_inc_button = Button(text='Up', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_hour_inc_press)
 
         self.hour_label = Label(color=[0, 0, 0, 1], text=str(self.hour))
 
-        hour_dec_button = Button(text='Down', background_color= [0.075, 0.71, 0.918, 1], on_press=self.hour_dec_press)
+        hour_dec_button = Button(text='Down', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_hour_dec_press)
 
-        ten_inc_button = Button(text='Up', background_color= [0.075, 0.71, 0.918, 1], on_press=self.ten_inc_press)
+        ten_inc_button = Button(text='Up', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_ten_inc_press)
 
         self.ten_label = Label(color=[0, 0, 0, 1], text=str(self.ten))
 
-        ten_dec_button = Button(text='Down', background_color= [0.075, 0.71, 0.918, 1], on_press=self.ten_dec_press)
+        ten_dec_button = Button(text='Down', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_ten_dec_press)
 
-        min_inc_button = Button(text='Up', background_color= [0.075, 0.71, 0.918, 1], on_press=self.min_inc_press)
+        min_inc_button = Button(text='Up', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_min_inc_press)
 
         self.min_label = Label(color=[0, 0, 0, 1], text=str(self.min))
 
-        min_dec_button = Button(text='Down', background_color= [0.075, 0.71, 0.918, 1], on_press=self.min_dec_press)
+        min_dec_button = Button(text='Down', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_min_dec_press)
+        
+        cd_timer_inc_button = Button(text='Up', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_cd_timer_inc_press)
+
+        self.cd_timer_label = Label(color=[0, 0, 0, 1], text=str(self.cd_timer))
+
+        cd_timer_dec_button = Button(text='Down', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_cd_timer_dec_press)
 
         #These are formatted so that the inc btns are the top row, labels are middle, and dec btns are bottom.
         time_layout.add_widget(hour_inc_button)
         time_layout.add_widget(ten_inc_button)
         time_layout.add_widget(min_inc_button)
+        time_layout.add_widget(cd_timer_inc_button)
         time_layout.add_widget(self.hour_label)
         time_layout.add_widget(self.ten_label)
         time_layout.add_widget(self.min_label)
+        time_layout.add_widget(self.cd_timer_label)
         time_layout.add_widget(hour_dec_button)
         time_layout.add_widget(ten_dec_button)
         time_layout.add_widget(min_dec_button)
+        time_layout.add_widget(cd_timer_dec_button)
 
         layout.add_widget(time_layout)
 
@@ -194,49 +202,63 @@ class SmartFanApp(App):
 
         out_title = Label(color=[0, 0, 0, 1], text= "Outside")
         self.out_label = Label(color=[0, 0, 0, 1], text="Connecting")
-
         temperature_layout.add_widget(acc_title)
         temperature_layout.add_widget(in_title)
         temperature_layout.add_widget(out_title)
-
+        
         temperature_layout.add_widget(self.acc_label)
         temperature_layout.add_widget(self.in_label)
         temperature_layout.add_widget(self.out_label)
-
+        
         layout.add_widget(temperature_layout)
         
-        it_thread = threading.Thread(target=self.update_inside_temp)
-        it_thread.start()
-        ot_thread = threading.Thread(target=self.update_outside_temp)
-        ot_thread.start()
+        it_thread = threading.Thread(target=self.update_inside_temp).start()
+        ot_thread = threading.Thread(target=self.update_outside_temp).start()
+        pred_thread = threading.Thread(target=self.get_prediction).start()
+        #update_thread = threading.Thread(target=self.make_request).start()
 
         return layout
  
+    def fan_power(self, instance = None):
+        output = bytes("power", 'utf-8')
+        self.server_socket.sendall(output)
+        self.fan_state = not self.fan_state
+        if instance != None:
+            self.user_pressed = True
  
+    def get_prediction(self):
+        i = 0
+        while True:
+            pred_result = self.prediction.predict()
+            if pred_result and not self.fan_state:
+                self.fan_power()
+            if not pred_result and self.fan_state:
+                self.fan_power()
+                
+            time.sleep(5)
+            
+            if self.user_pressed:
+                time.sleep(self.cd_timer * 60)
+                self.user_pressed = False
+
     def make_request(self, instance):
         # Make a GET request
         # url = 'http://10.3.62.239:8000/data'
         url = 'http://192.168.1.18:8000/data'
+        #while True:
         self.request = UrlRequest(url, on_success=self.on_success, on_failure=self.on_failure)
-
-    def on_success(self, request, result):
-        print("Received data:", result)
-        self.web_update_temp(result)
-        self.web_update_time(result)
+            #sleep(5)
 
     def on_failure(self, request, error):
         print("Request failed:", error)
-
-    def web_update_temp(self, results):
-        self.min_temp = results.get('minTempValue')
-        self.max_temp = results.get('maxTempValue')
-        self.update_temp_labels()
-
-    def web_update_time(self, results):
-        self.hour = results.get('hoursValue')
-        self.ten = results.get('tenMinutesValue')
-        self.min = results.get('minutesValue')
-        self.update_time_labels()
+        
+    def on_cd_timer_dec_press(self, instance):
+        self.cd_timer -= 1
+        self.cd_timer_label.text = str(self.cd_timer)
+        
+    def on_cd_timer_inc_press(self, instance):
+        self.cd_timer += 1
+        self.cd_timer_label.text = str(self.cd_timer)
 
     def on_min_temp_dec_press(self, instance):
         self.min_temp -= 1
@@ -264,56 +286,47 @@ class SmartFanApp(App):
         self.update_temp_labels()
         self.send_message()
 
-    def update_temp_labels(self):
-        if self.min_temp_label:
-            self.min_temp_label.text = str(self.min_temp)
-        if self.max_temp_label:
-            self.max_temp_label.text = str(self.max_temp)
-
-    def update_time_labels(self):
-        if self.hour_label:
-            self.hour_label.text = str(self.hour)
-        if self.ten_label:
-            self.ten_label.text = str(self.ten)
-        if self.min_label:
-            self.min_label.text = str(self.min)
+    def on_success(self, request, result):
+        print("Received data:", result)
+        self.web_update_temp(result)
+        self.web_update_time(result)
     
-    def hour_dec_press(self, instance):
+    def on_hour_dec_press(self, instance):
         self.hour -= 1
         if self.hour == -1:
             self.hour = 23
         self.update_time_labels()
         self.send_message()
 
-    def hour_inc_press(self, instance):
+    def on_hour_inc_press(self, instance):
         self.hour += 1
         if self.hour == 24:
             self.hour = 0
         self.update_time_labels()
         self.send_message()
 
-    def ten_dec_press(self, instance):
+    def on_ten_dec_press(self, instance):
         self.ten -= 1
         if self.ten == -1:
             self.ten = 5
         self.update_time_labels()
         self.send_message()
 
-    def ten_inc_press(self, instance):
+    def on_ten_inc_press(self, instance):
         self.ten += 1
         if self.ten == 6:
             self.ten = 0
         self.update_time_labels()
         self.send_message()
 
-    def min_dec_press(self, instance):
+    def on_min_dec_press(self, instance):
         self.min -= 1
         if self.min == -1:
             self.min = 9
         self.update_time_labels()
         self.send_message()
 
-    def min_inc_press(self, instance):
+    def on_min_inc_press(self, instance):
         self.min += 1
         if self.min == 10:
             self.min = 0
@@ -364,19 +377,9 @@ class SmartFanApp(App):
         # Send the request
         with urllib.request.urlopen(req) as response:
             response = response.read().decode('utf-8')
-
+            
     def get_prediction(self):
         fan_state = False
-<<<<<<< HEAD
-        #while True:
-            #if self.prediction.predict() and not fan_state:
-            #    fan_state = True
-            #    self.fan_power()
-            #if not self.prediction.predict() and fan_state:
-            #    fan_state = False
-            #    self.fan_power()
-            #time.sleep(540)
-=======
         while True:
             if self.prediction.predict() and not fan_state:
                 fan_state = True
@@ -385,7 +388,6 @@ class SmartFanApp(App):
                 fan_state = False
                 self.fan_power()
             time.sleep(540)
->>>>>>> 5752e814873eff80deb9f142c95bb9585591c47d
             
     def update_inside_temp(self):
         while True:
@@ -403,7 +405,31 @@ class SmartFanApp(App):
                 self.out_label.text = str(self.out_temp)
             time.sleep(1)
             
+    def update_temp_labels(self):
+        if self.min_temp_label:
+            self.min_temp_label.text = str(self.min_temp)
+        if self.max_temp_label:
+            self.max_temp_label.text = str(self.max_temp)
 
+    def update_time_labels(self):
+        if self.hour_label:
+            self.hour_label.text = str(self.hour)
+        if self.ten_label:
+            self.ten_label.text = str(self.ten)
+        if self.min_label:
+            self.min_label.text = str(self.min)
+            
+    def web_update_temp(self, results):
+        self.min_temp = results.get('minTempValue')
+        self.max_temp = results.get('maxTempValue')
+        self.update_temp_labels()
+
+    def web_update_time(self, results):
+        self.hour = results.get('hoursValue')
+        self.ten = results.get('tenMinutesValue')
+        self.min = results.get('minutesValue')
+        self.update_time_labels()
+            
 
 
 def run():
