@@ -66,7 +66,7 @@ class SmartFanApp(App):
 
 
         Clock.schedule_once(self.make_request, 0)
-        Clock.schedule_once(self.update_acc_weather, 0)
+        #Clock.schedule_once(self.update_acc_weather, 0)
 
         #repeated every 10 minutes
         Clock.schedule_interval(self.make_request, 1)
