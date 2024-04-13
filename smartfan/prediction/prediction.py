@@ -10,7 +10,7 @@ class Prediction():
         self.in_climate = in_climate
         self.out_climate = out_climate
         self.is_online = is_online
-        self.forecast_temp_arr
+        self.forecast_temp_arr = []
         if self.is_online: self.forecast = Forecast()
         
     def get_accuweather_temps(self):
