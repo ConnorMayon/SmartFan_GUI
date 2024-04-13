@@ -300,7 +300,7 @@ class SmartFanApp(App):
             self.sched_label_list.append(oldest_label)
         else:
             # Add a new label
-            new_label = Label(text=time_value, color=[0, 0, 0, 1], size_hint=(None, None), size=(305, 40), pos=(500, 515 - len(self.sched_list) * 30))
+            new_label = Label(text=time_value, color=[0, 0, 0, 1], size_hint=(None, None), size=(305, 40), pos=(500, 390 - len(self.sched_list) * 30))
             self.root.add_widget(new_label)
             self.sched_label_list.append(new_label)
         self.sched_list.append(time_value)
