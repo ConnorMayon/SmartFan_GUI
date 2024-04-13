@@ -71,7 +71,7 @@ class SmartFanApp(App):
 
         layout = FloatLayout()
 
-        title_label = Label(text="Preferred Temperature Range", size_hint=(None, None), pos=(0, 4255), color=[0, 0, 0, 1], size=(305, 40))
+        title_label = Label(text="Preferred Temperature Range", size_hint=(None, None), pos=(0, 425), color=[0, 0, 0, 1], size=(305, 40))
         layout.add_widget(title_label)
 
         range_label = Label(text="Preferred Cooling Time", size_hint=(None, None), pos=(250, 425), color=[0, 0, 0, 1], size=(305, 40))
@@ -200,7 +200,7 @@ class SmartFanApp(App):
     def on_cd_timer_dec_press(self, instance):
         self.cd_timer -= 1
         if self.cd_timer == 0:
-            self.cd_timer_label.text = "Off"
+            self.cd_timer_label.text = "Manual"
         elif self.cd_timer == -1:
             self.cd_timer = 0
         else:
