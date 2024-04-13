@@ -46,7 +46,6 @@ class SmartFanApp(App):
         self.cd_timer = 1
         self.sched_list = []
         self.sched_label_list = []
-        #self.forecast = Forecast()
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
         self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, False)
@@ -63,7 +62,6 @@ class SmartFanApp(App):
         #PORT = 8000            # The same port as used by the server
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.connect((HOST, PORT))
-
 
         Clock.schedule_once(self.make_request, 0)
         #Clock.schedule_once(self.update_acc_weather, 0)
@@ -184,6 +182,9 @@ class SmartFanApp(App):
     def fan_power(self, instance):
         output = bytes("power", 'utf-8')
         self.server_socket.sendall(output)
+        self.fan_state = not self.fan_state
+        if instance != None:
+            self.user_pressed = True
     
     def get_prediction(self):
         while True:
@@ -288,13 +289,13 @@ class SmartFanApp(App):
         self.update_time_labels()
         self.send_message()
         
+    def on_request_failure(self, request, error):
+        print("Request failed:", error)
+        
     def on_request_success(self, request, result):
         print("Received data:", result)
         self.web_update_temp(result)
         self.web_update_time(result)
-
-    def on_request_failure(self, request, error):
-        print("Request failed:", error)
 
     def save_time(self, instance):
         time_value = f"{self.hour:02}:{self.ten}{self.min}"

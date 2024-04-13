@@ -29,25 +29,8 @@ def define_argparser(command_parser: _SubParsersAction):
 class SchedulingPage(GridLayout):
     def __init__(self, switch_home_callback, sched_list, **kwargs):
         super().__init__(**kwargs)
-        self.cols = 5
-        self.rows = 10
-        self.col_force_default=True
-        self.col_default_width=90
-        self.sched_list=sched_list
-        self.message=""
-        self.add_widget(Label())
-        self.add_widget(Label())
-        self.add_widget(Label())
-        self.add_widget(Label())
-        self.add_widget(Label(color=[0,0,0,1], halign='center', bold=True, text='Scheduling Page'))
-        self.add_widget(Label())
-        home_btn=Button(text='Home', background_color= [0.075, 0.71, 0.918, 1], on_press=switch_home_callback)
-        self.add_widget(home_btn)
-        if len(self.sched_list) != 0:
-            for item in sched_list:
-                label = Label(text=item)
-                self.add_widget(label)
-            #self.send_message("savedtime", self.message)
+        self.min_temp_label = None
+        self.max_temp_label = None
 
 class SmartFanApp(App):
     Window.clearcolor = (1, 1, 1, 1)
@@ -67,12 +50,10 @@ class SmartFanApp(App):
         self.cd_timer = 1
         self.sched_list = []
         self.sched_label_list = []
-        #self.forecast = Forecast()
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
-        self.acctemp_array = [32, 30, 29, 28, 30, 31, 32, 29, 33, 25, 31, 33]
         self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, False)
-        self.acc_temp = self.acctemp_array[0]
+        self.acc_temp = 0
         self.in_temp  = 0
         self.out_temp = 0
         self.fan_state = False
@@ -80,136 +61,118 @@ class SmartFanApp(App):
 
         # Connect to fan pi
         HOST = '192.168.1.161'    # The remote host
-        PORT = 50007              # The same port as used by the server
+        #HOST = '10.3.62.253'
+        PORT = 50007
+        #PORT = 8000            # The same port as used by the server
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.connect((HOST, PORT))
 
-        layout = GridLayout(cols=2, rows=6, row_force_default=True, col_force_default= True, col_default_width=350, row_default_height=50)
+        Clock.schedule_once(self.make_request, 0)
+        #Clock.schedule_once(self.update_acc_weather, 0)
 
-        title_lable_layout = GridLayout(cols=2, col_force_default=True, col_default_width=305, row_force_default=True, row_default_height=40)
+        #repeated every 10 minutes
+        Clock.schedule_interval(self.make_request, 1)
+        #Clock.schedule_interval(self.update_acc_weather, 3600)
 
-        range_label=Label(color=[0, 0, 0, 1], bold=True, text="Set Perferred Temperature Range")
+        layout = FloatLayout()
 
-        title_lable_layout.add_widget(range_label)
+        title_label = Label(text="Preferred Temperature Range", size_hint=(None, None), pos=(0, 425), color=[0, 0, 0, 1], size=(305, 40))
+        layout.add_widget(title_label)
 
-        sched_label=Label(color=[0, 0, 0, 1], bold=True, text="Set Perferred Cooling Time / Cooldown Timer")
+        range_label = Label(text="Preferred Cooling Time", size_hint=(None, None), pos=(250, 425), color=[0, 0, 0, 1], size=(305, 40))
+        layout.add_widget(range_label)
 
-        title_lable_layout.add_widget(sched_label)
+        sched_label = Label(text="Scheduling", size_hint=(None, None), pos=(500, 425), color=[0, 0, 0, 1], size=(305, 40))
+        layout.add_widget(sched_label)
+
+        min_temp_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(65, 355), size_hint=(None, None), size=(70, 60), on_press=self.on_min_temp_inc_press)
+        layout.add_widget(min_temp_inc_button)
+
+        max_temp_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(170, 355), size_hint=(None, None), size=(70, 60), on_press=self.on_max_temp_inc_press)
+        layout.add_widget(max_temp_inc_button)
+
+        self.min_temp_label = Label(color=[0, 0, 0, 1], text=str(self.min_temp), pos=(65, 300), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(self.min_temp_label)
         
-        layout.add_widget(title_lable_layout)
-        layout.add_widget(Label()) # Empty space
+        self.hyphen_label = Label(color=[0, 0, 0, 1], text='-', pos=(115, 300), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(self.hyphen_label)
 
-        temp_layout = GridLayout(rows=3, cols=2, col_force_default=True, col_default_width=70, row_force_default= True, row_default_height=60, padding=[70, 0])
+        self.max_temp_label = Label(color=[0, 0, 0, 1], text=str(self.max_temp), pos=(170, 300), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(self.max_temp_label)
 
-        min_temp_inc_button = Button(text='Up', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_min_temp_inc_press)
+        min_temp_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(65, 245), size_hint=(None, None), size=(70, 60), on_press=self.on_min_temp_dec_press)
+        layout.add_widget(min_temp_dec_button)
 
-        self.min_temp_label = Label(color=[0, 0, 0, 1], text=str(self.min_temp))
+        max_temp_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(170, 245), size_hint=(None, None), size=(70, 60), on_press=self.on_max_temp_dec_press)
+        layout.add_widget(max_temp_dec_button)
 
-        min_temp_dec_button = Button(text='Down', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_min_temp_dec_press)
+        hour_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(290, 355), size_hint=(None, None), size=(70, 60), on_press=self.on_hour_inc_press)
+        layout.add_widget(hour_inc_button)
 
-        max_temp_inc_button = Button(text='Up', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_max_temp_inc_press)
+        ten_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(365, 355), size_hint=(None, None), size=(70, 60), on_press=self.on_ten_inc_press)
+        layout.add_widget(ten_inc_button)
 
-        self.max_temp_label = Label(color=[0, 0, 0, 1], text=str(self.max_temp))
+        min_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(440, 355), size_hint=(None, None), size=(70, 60), on_press=self.on_min_inc_press)
+        layout.add_widget(min_inc_button)
 
-        max_temp_dec_button = Button(text='Down', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_max_temp_dec_press)
-
-        temp_layout.add_widget(min_temp_inc_button)
-        temp_layout.add_widget(max_temp_inc_button)
-        temp_layout.add_widget(self.min_temp_label)
-        temp_layout.add_widget(self.max_temp_label)
-        temp_layout.add_widget(min_temp_dec_button)
-        temp_layout.add_widget(max_temp_dec_button)
-
-        layout.add_widget(temp_layout)
-
-        time_layout = GridLayout(rows=3, cols=4, col_force_default=True, col_default_width=70, row_default_height=60)
-
-        hour_inc_button = Button(text='Up', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_hour_inc_press)
-
-        self.hour_label = Label(color=[0, 0, 0, 1], text=str(self.hour))
-
-        hour_dec_button = Button(text='Down', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_hour_dec_press)
-
-        ten_inc_button = Button(text='Up', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_ten_inc_press)
-
-        self.ten_label = Label(color=[0, 0, 0, 1], text=str(self.ten))
-
-        ten_dec_button = Button(text='Down', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_ten_dec_press)
-
-        min_inc_button = Button(text='Up', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_min_inc_press)
-
-        self.min_label = Label(color=[0, 0, 0, 1], text=str(self.min))
-
-        min_dec_button = Button(text='Down', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_min_dec_press)
+        self.hour_label = Label(color=[0, 0, 0, 1], text=str(self.hour), pos=(290, 300), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(self.hour_label)
         
-        cd_timer_inc_button = Button(text='Up', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_cd_timer_inc_press)
+        self.colon_label = Label(color=[0, 0, 0, 1], text=':', pos=(327, 300), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(self.colon_label)
 
-        self.cd_timer_label = Label(color=[0, 0, 0, 1], text=str(self.cd_timer))
+        self.ten_label = Label(color=[0, 0, 0, 1], text=str(self.ten), pos=(365, 300), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(self.ten_label)
 
-        cd_timer_dec_button = Button(text='Down', background_color= [0.075, 0.71, 0.918, 1], on_press=self.on_cd_timer_dec_press)
+        self.min_label = Label(color=[0, 0, 0, 1], text=str(self.min), pos=(440, 300), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(self.min_label)
 
-        #These are formatted so that the inc btns are the top row, labels are middle, and dec btns are bottom.
-        time_layout.add_widget(hour_inc_button)
-        time_layout.add_widget(ten_inc_button)
-        time_layout.add_widget(min_inc_button)
-        time_layout.add_widget(cd_timer_inc_button)
-        time_layout.add_widget(self.hour_label)
-        time_layout.add_widget(self.ten_label)
-        time_layout.add_widget(self.min_label)
-        time_layout.add_widget(self.cd_timer_label)
-        time_layout.add_widget(hour_dec_button)
-        time_layout.add_widget(ten_dec_button)
-        time_layout.add_widget(min_dec_button)
-        time_layout.add_widget(cd_timer_dec_button)
+        hour_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(290, 245), size_hint=(None, None), size=(70, 60), on_press=self.on_hour_dec_press)
+        layout.add_widget(hour_dec_button)
 
-        layout.add_widget(time_layout)
+        ten_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(365, 245), size_hint=(None, None), size=(70, 60), on_press=self.on_ten_dec_press)
+        layout.add_widget(ten_dec_button)
 
-        button_row_layout=GridLayout(cols=3, rows=2, row_force_default=True, row_default_height=40, padding=[25, 0])
-
-        save_time_button = Button(text='Save Time', background_color= [0.075, 0.71, 0.918, 1], on_press=self.save_time)
-
-        button_row_layout.add_widget(save_time_button)
-
-        switch_page_button = Button(text='Switch Page', background_color= [0.075, 0.71, 0.918, 1], on_press=self.switch_page)
-         
-        button_row_layout.add_widget(switch_page_button)
-
-        fan_power_button = Button(text='Fan ON/OFF', background_color= [0.075, 0.71, 0.918, 1], on_press=self.fan_power)
-
-        button_row_layout.add_widget(fan_power_button)
-
-        update_button = Button(text='Update', background_color= [0.075, 0.71, 0.918, 1], on_press=self.make_request)
-
-        button_row_layout.add_widget(update_button)
-
-        layout.add_widget(Label())  # Empty space
-        layout.add_widget(Label())  # Empty space
-        layout.add_widget(Label())  # Empty space
-        layout.add_widget(Label())  # Empty space
-        layout.add_widget(Label())  # Empty space
-        layout.add_widget(Label())  # Empty space
-        layout.add_widget(button_row_layout)
-
-        temperature_layout = GridLayout(rows=2, cols=3, col_force_default=True, col_default_width=70, row_default_height=60)
-
-        acc_title = Label(color=[0, 0, 0, 1], text= "Forecast")
-        self.acc_label = Label(color=[0, 0, 0, 1], text=str(self.acc_temp))
-
-        in_title = Label(color=[0, 0, 0, 1], text= "Inside")
-        self.in_label = Label(color=[0, 0, 0, 1], text="Connecting")
-
-        out_title = Label(color=[0, 0, 0, 1], text= "Outside")
-        self.out_label = Label(color=[0, 0, 0, 1], text="Connecting")
+        min_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(440, 245), size_hint=(None, None), size=(70, 60), on_press=self.on_min_dec_press)
+        layout.add_widget(min_dec_button)
         
-        temperature_layout.add_widget(acc_title)
-        temperature_layout.add_widget(in_title)
-        temperature_layout.add_widget(out_title)
-        
-        temperature_layout.add_widget(self.acc_label)
-        temperature_layout.add_widget(self.in_label)
-        temperature_layout.add_widget(self.out_label)
-        
-        layout.add_widget(temperature_layout)
+        save_time_button = Button(text='Save Time', size_hint=(None, None), pos=(65, 160), background_color=[0.075, 0.71, 0.918, 1], size=(200, 60))
+        save_time_button.bind(on_press=self.save_time)
+        layout.add_widget(save_time_button)
+
+        fan_power_button = Button(text='Fan ON/OFF', size_hint=(None, None), pos=(65, 85), background_color=[0.075, 0.71, 0.918, 1], size=(200, 60))
+        fan_power_button.bind(on_press=self.fan_power)
+        layout.add_widget(fan_power_button)
+
+        acc_title = Label(color=[0, 0, 0, 1], text="Forecast", pos=(285, 175), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(acc_title)
+
+        in_title = Label(color=[0, 0, 0, 1], text="Inside", pos=(385, 175), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(in_title)
+
+        out_title = Label(color=[0, 0, 0, 1], text="Outside", pos=(485, 175), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(out_title)
+
+        self.acc_label = Label(color=[0, 0, 0, 1], text="No internet", pos=(285, 125), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(self.acc_label)
+
+        self.in_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(385, 125), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(self.in_label)
+
+        self.out_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(485, 125), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(self.out_label)
+
+        self.alg_label = Label(color=[0, 0, 0, 1], text="Algorithm Timeout", pos=(620, 235), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(self.alg_label)
+
+        self.cd_timer_label = Label(color=[0, 0, 0, 1], text=str(self.cd_timer), pos=(620, 120), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(self.cd_timer_label)
+
+        alg_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(620, 175), size_hint=(None, None), size=(70, 60), on_press=self.on_cd_timer_inc_press)
+        layout.add_widget(alg_inc_button)
+
+        alg_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(620, 65), size_hint=(None, None), size=(70, 60), on_press=self.on_cd_timer_dec_press)
+        layout.add_widget(alg_dec_button)
         
         it_thread = threading.Thread(target=self.update_inside_temp).start()
         ot_thread = threading.Thread(target=self.update_outside_temp).start()
@@ -229,27 +192,24 @@ class SmartFanApp(App):
     def get_prediction(self):
         while True:
             pred_result = self.prediction.predict()
-            if pred_result and not self.fan_state and self.cd_timer != 0:
-                self.fan_power()
-            if not pred_result and self.fan_state and self.cd_timer != 0:
-                self.fan_power()
-                
-            time.sleep(1)
-            
-            if self.user_pressed and self.cd_timer != 0:
-                time.sleep(self.cd_timer * 60)
-                self.user_pressed = False
+            if self.cd_timer != 0:
+                if pred_result and not self.fan_state:
+                    self.fan_power()
+                if not pred_result and self.fan_state:
+                    self.fan_power()
+
+                if self.user_pressed:
+                    time.sleep(self.cd_timer * 60)
+                    self.user_pressed = False
+                else:
+                    time.sleep(1)
 
     def make_request(self, instance):
         # Make a GET request
         # url = 'http://10.3.62.239:8000/data'
         url = 'http://192.168.1.18:8000/data'
-        #while True:
-        self.request = UrlRequest(url, on_success=self.on_success, on_failure=self.on_failure)
-            #sleep(5)
 
-    def on_failure(self, request, error):
-        print("Request failed:", error)
+        self.request = UrlRequest(url, on_success=self.on_success, on_failure=self.on_failure)
         
     def on_cd_timer_dec_press(self, instance):
         self.cd_timer -= 1
@@ -289,11 +249,6 @@ class SmartFanApp(App):
         self.prediction.update_range_max(self.max_temp)
         self.update_temp_labels()
         self.send_message()
-
-    def on_success(self, request, result):
-        print("Received data:", result)
-        self.web_update_temp(result)
-        self.web_update_time(result)
     
     def on_hour_dec_press(self, instance):
         self.hour -= 1
@@ -336,6 +291,14 @@ class SmartFanApp(App):
             self.min = 0
         self.update_time_labels()
         self.send_message()
+        
+    def on_request_failure(self, request, error):
+        print("Request failed:", error)
+        
+    def on_request_success(self, request, result):
+        print("Received data:", result)
+        self.web_update_temp(result)
+        self.web_update_time(result)
 
     #needs update after changes
     def save_time(self, instance):
