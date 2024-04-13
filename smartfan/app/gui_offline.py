@@ -26,7 +26,7 @@ def define_argparser(command_parser: _SubParsersAction):
     p = command_parser.add_parser(
         'run_offline', help='run smartfan app')
 
-    p.set_defaults(handler=lambda args: run_offline())
+    p.set_defaults(handler=lambda args: run())
 
 class SmartFanApp(App):
     Window.clearcolor = (1, 1, 1, 1)
@@ -147,7 +147,7 @@ class SmartFanApp(App):
         out_title = Label(color=[0, 0, 0, 1], text="Outside", pos=(485, 175), size_hint=(None, None), size=(70, 60))
         layout.add_widget(out_title)
 
-        self.acc_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(285, 125), size_hint=(None, None), size=(70, 60))
+        self.acc_label = Label(color=[0, 0, 0, 1], text="No internet", pos=(285, 125), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.acc_label)
 
         self.in_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(385, 125), size_hint=(None, None), size=(70, 60))
@@ -371,7 +371,7 @@ class SmartFanApp(App):
         self.update_time_labels()
 
 
-def run_offline():
+def run():
     #os.popen('xset dpms 30 30 30')  # Set screen blanking to 15 seconds
     
     # Set window to full screen
