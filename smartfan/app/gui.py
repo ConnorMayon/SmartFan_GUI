@@ -71,96 +71,96 @@ class SmartFanApp(App):
 
         layout = FloatLayout()
 
-        title_label = Label(text="Preferred Temperature Range", size_hint=(None, None), pos=(0, 550), color=[0, 0, 0, 1], size=(305, 40))
+        title_label = Label(text="Preferred Temperature Range", size_hint=(None, None), pos=(0, 4255), color=[0, 0, 0, 1], size=(305, 40))
         layout.add_widget(title_label)
 
-        range_label = Label(text="Preferred Cooling Time", size_hint=(None, None), pos=(250, 550), color=[0, 0, 0, 1], size=(305, 40))
+        range_label = Label(text="Preferred Cooling Time", size_hint=(None, None), pos=(250, 425), color=[0, 0, 0, 1], size=(305, 40))
         layout.add_widget(range_label)
 
-        sched_label = Label(text="Scheduling", size_hint=(None, None), pos=(500, 550), color=[0, 0, 0, 1], size=(305, 40))
+        sched_label = Label(text="Scheduling", size_hint=(None, None), pos=(500, 425), color=[0, 0, 0, 1], size=(305, 40))
         layout.add_widget(sched_label)
 
-        min_temp_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(65, 480), size_hint=(None, None), size=(70, 60), on_press=self.on_min_temp_inc_press)
+        min_temp_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(65, 355), size_hint=(None, None), size=(70, 60), on_press=self.on_min_temp_inc_press)
         layout.add_widget(min_temp_inc_button)
 
-        max_temp_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(170, 480), size_hint=(None, None), size=(70, 60), on_press=self.on_max_temp_inc_press)
+        max_temp_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(170, 355), size_hint=(None, None), size=(70, 60), on_press=self.on_max_temp_inc_press)
         layout.add_widget(max_temp_inc_button)
 
-        self.min_temp_label = Label(color=[0, 0, 0, 1], text=str(self.min_temp), pos=(65, 425), size_hint=(None, None), size=(70, 60))
+        self.min_temp_label = Label(color=[0, 0, 0, 1], text=str(self.min_temp), pos=(65, 300), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.min_temp_label)
 
-        self.max_temp_label = Label(color=[0, 0, 0, 1], text=str(self.max_temp), pos=(170, 425), size_hint=(None, None), size=(70, 60))
+        self.max_temp_label = Label(color=[0, 0, 0, 1], text=str(self.max_temp), pos=(170, 300), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.max_temp_label)
 
-        min_temp_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(65, 370), size_hint=(None, None), size=(70, 60), on_press=self.on_min_temp_dec_press)
+        min_temp_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(65, 245), size_hint=(None, None), size=(70, 60), on_press=self.on_min_temp_dec_press)
         layout.add_widget(min_temp_dec_button)
 
-        max_temp_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(170, 370), size_hint=(None, None), size=(70, 60), on_press=self.on_max_temp_dec_press)
+        max_temp_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(170, 245), size_hint=(None, None), size=(70, 60), on_press=self.on_max_temp_dec_press)
         layout.add_widget(max_temp_dec_button)
 
-        hour_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(290, 480), size_hint=(None, None), size=(70, 60), on_press=self.on_hour_inc_press)
+        hour_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(290, 355), size_hint=(None, None), size=(70, 60), on_press=self.on_hour_inc_press)
         layout.add_widget(hour_inc_button)
 
-        ten_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(365, 480), size_hint=(None, None), size=(70, 60), on_press=self.on_ten_inc_press)
+        ten_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(365, 355), size_hint=(None, None), size=(70, 60), on_press=self.on_ten_inc_press)
         layout.add_widget(ten_inc_button)
 
-        min_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(440, 480), size_hint=(None, None), size=(70, 60), on_press=self.on_min_inc_press)
+        min_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(440, 355), size_hint=(None, None), size=(70, 60), on_press=self.on_min_inc_press)
         layout.add_widget(min_inc_button)
 
-        self.hour_label = Label(color=[0, 0, 0, 1], text=str(self.hour), pos=(290, 425), size_hint=(None, None), size=(70, 60))
+        self.hour_label = Label(color=[0, 0, 0, 1], text=str(self.hour), pos=(290, 300), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.hour_label)
 
-        self.ten_label = Label(color=[0, 0, 0, 1], text=str(self.ten), pos=(365, 425), size_hint=(None, None), size=(70, 60))
+        self.ten_label = Label(color=[0, 0, 0, 1], text=str(self.ten), pos=(365, 300), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.ten_label)
 
-        self.min_label = Label(color=[0, 0, 0, 1], text=str(self.min), pos=(440, 425), size_hint=(None, None), size=(70, 60))
+        self.min_label = Label(color=[0, 0, 0, 1], text=str(self.min), pos=(440, 300), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.min_label)
 
-        hour_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(290, 370), size_hint=(None, None), size=(70, 60), on_press=self.on_hour_dec_press)
+        hour_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(290, 245), size_hint=(None, None), size=(70, 60), on_press=self.on_hour_dec_press)
         layout.add_widget(hour_dec_button)
 
-        ten_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(365, 370), size_hint=(None, None), size=(70, 60), on_press=self.on_ten_dec_press)
+        ten_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(365, 245), size_hint=(None, None), size=(70, 60), on_press=self.on_ten_dec_press)
         layout.add_widget(ten_dec_button)
 
-        min_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(440, 370), size_hint=(None, None), size=(70, 60), on_press=self.on_min_dec_press)
+        min_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(440, 245), size_hint=(None, None), size=(70, 60), on_press=self.on_min_dec_press)
         layout.add_widget(min_dec_button)
         
-        save_time_button = Button(text='Save Time', size_hint=(None, None), pos=(65, 285), background_color=[0.075, 0.71, 0.918, 1], size=(200, 60))
+        save_time_button = Button(text='Save Time', size_hint=(None, None), pos=(65, 160), background_color=[0.075, 0.71, 0.918, 1], size=(200, 60))
         save_time_button.bind(on_press=self.save_time)
         layout.add_widget(save_time_button)
 
-        fan_power_button = Button(text='Fan ON/OFF', size_hint=(None, None), pos=(65, 210), background_color=[0.075, 0.71, 0.918, 1], size=(200, 60))
+        fan_power_button = Button(text='Fan ON/OFF', size_hint=(None, None), pos=(65, 85), background_color=[0.075, 0.71, 0.918, 1], size=(200, 60))
         fan_power_button.bind(on_press=self.fan_power)
         layout.add_widget(fan_power_button)
 
-        acc_title = Label(color=[0, 0, 0, 1], text="Forecast", pos=(285, 300), size_hint=(None, None), size=(70, 60))
+        acc_title = Label(color=[0, 0, 0, 1], text="Forecast", pos=(285, 175), size_hint=(None, None), size=(70, 60))
         layout.add_widget(acc_title)
 
-        in_title = Label(color=[0, 0, 0, 1], text="Inside", pos=(385, 300), size_hint=(None, None), size=(70, 60))
+        in_title = Label(color=[0, 0, 0, 1], text="Inside", pos=(385, 175), size_hint=(None, None), size=(70, 60))
         layout.add_widget(in_title)
 
-        out_title = Label(color=[0, 0, 0, 1], text="Outside", pos=(485, 300), size_hint=(None, None), size=(70, 60))
+        out_title = Label(color=[0, 0, 0, 1], text="Outside", pos=(485, 175), size_hint=(None, None), size=(70, 60))
         layout.add_widget(out_title)
 
-        self.acc_label = Label(color=[0, 0, 0, 1], text=str(self.acc_temp), pos=(285, 250), size_hint=(None, None), size=(70, 60))
+        self.acc_label = Label(color=[0, 0, 0, 1], text=str(self.acc_temp), pos=(285, 125), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.acc_label)
 
-        self.in_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(385, 250), size_hint=(None, None), size=(70, 60))
+        self.in_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(385, 125), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.in_label)
 
-        self.out_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(485, 250), size_hint=(None, None), size=(70, 60))
+        self.out_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(485, 125), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.out_label)
 
-        self.alg_label = Label(color=[0, 0, 0, 1], text="Algorithm Timeout", pos=(620, 360), size_hint=(None, None), size=(70, 60))
+        self.alg_label = Label(color=[0, 0, 0, 1], text="Algorithm Timeout", pos=(620, 235), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.alg_label)
 
-        self.cd_timer_label = Label(color=[0, 0, 0, 1], text=str(self.cd_timer), pos=(620, 245), size_hint=(None, None), size=(70, 60))
+        self.cd_timer_label = Label(color=[0, 0, 0, 1], text=str(self.cd_timer), pos=(620, 120), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.cd_timer_label)
 
-        alg_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(620, 300), size_hint=(None, None), size=(70, 60), on_press=self.on_cd_timer_inc_press)
+        alg_inc_button = Button(text='Up', background_color=[0.075, 0.71, 0.918, 1], pos=(620, 175), size_hint=(None, None), size=(70, 60), on_press=self.on_cd_timer_inc_press)
         layout.add_widget(alg_inc_button)
 
-        alg_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(620, 190), size_hint=(None, None), size=(70, 60), on_press=self.on_cd_timer_dec_press)
+        alg_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(620, 65), size_hint=(None, None), size=(70, 60), on_press=self.on_cd_timer_dec_press)
         layout.add_widget(alg_dec_button)
         
         it_thread = threading.Thread(target=self.update_inside_temp).start()
