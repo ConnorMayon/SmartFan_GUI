@@ -142,7 +142,7 @@ class SmartFanApp(App):
         out_title = Label(color=[0, 0, 0, 1], text="Outside", pos=(485, 175), size_hint=(None, None), size=(70, 60))
         layout.add_widget(out_title)
 
-        self.acc_label = Label(color=[0, 0, 0, 1], text=str(self.acc_temp), pos=(285, 125), size_hint=(None, None), size=(70, 60))
+        self.acc_label = Label(color=[0, 0, 0, 1], text=str(round(self.acc_temp, 2)), pos=(285, 125), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.acc_label)
 
         self.in_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(385, 125), size_hint=(None, None), size=(70, 60))
