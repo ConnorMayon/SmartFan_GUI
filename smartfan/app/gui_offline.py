@@ -24,7 +24,7 @@ def define_argparser(command_parser: _SubParsersAction):
     Define `run_offline` subcommand.
     """
     p = command_parser.add_parser(
-        'run', help='run smartfan app')
+        'run_offline', help='run smartfan app')
 
     p.set_defaults(handler=lambda args: run())
 
