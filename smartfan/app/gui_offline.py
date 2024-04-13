@@ -227,17 +227,16 @@ class SmartFanApp(App):
             self.user_pressed = True
  
     def get_prediction(self):
-        i = 0
         while True:
             pred_result = self.prediction.predict()
-            if pred_result and not self.fan_state:
+            if pred_result and not self.fan_state and self.cd_timer != 0:
                 self.fan_power()
-            if not pred_result and self.fan_state:
+            if not pred_result and self.fan_state and self.cd_timer != 0:
                 self.fan_power()
                 
-            time.sleep(5)
+            time.sleep(1)
             
-            if self.user_pressed:
+            if self.user_pressed and self.cd_timer != 0:
                 time.sleep(self.cd_timer * 60)
                 self.user_pressed = False
 
@@ -254,7 +253,12 @@ class SmartFanApp(App):
         
     def on_cd_timer_dec_press(self, instance):
         self.cd_timer -= 1
-        self.cd_timer_label.text = str(self.cd_timer)
+        if self.cd_timer == 0:
+            self.cd_timer_label.text = "Off"
+        elif self.cd_timer == -1:
+            self.cd_timer = 0
+        else:
+            self.cd_timer_label.text = str(self.cd_timer)
         
     def on_cd_timer_inc_press(self, instance):
         self.cd_timer += 1
@@ -353,10 +357,6 @@ class SmartFanApp(App):
         app = App.get_running_app()
         app.root.clear_widgets()
         app.root.add_widget(app.build())
-
-    def fan_power(self, instance):
-        output = bytes("power", 'utf-8')
-        self.server_socket.sendall(output)
    
     def send_message(self):
         # Base URL of the server
