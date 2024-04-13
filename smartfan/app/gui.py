@@ -70,7 +70,7 @@ class SmartFanApp(App):
 
         #repeated every 10 minutes
         Clock.schedule_interval(self.make_request, 1)
-        Clock.schedule_interval(self.update_acc_weather, 3600)
+        #Clock.schedule_interval(self.update_acc_weather, 3600)
 
         layout = FloatLayout()
 
