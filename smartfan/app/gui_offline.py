@@ -10,6 +10,7 @@ from smartfan.prediction.prediction import Prediction
 import urllib.parse
 import urllib.request
 import threading
+import os
 import time
 import asyncio
 import socket
@@ -201,7 +202,6 @@ class SmartFanApp(App):
 
         out_title = Label(color=[0, 0, 0, 1], text= "Outside")
         self.out_label = Label(color=[0, 0, 0, 1], text="Connecting")
-        
         temperature_layout.add_widget(acc_title)
         temperature_layout.add_widget(in_title)
         temperature_layout.add_widget(out_title)
@@ -285,7 +285,7 @@ class SmartFanApp(App):
         self.prediction.update_range_max(self.max_temp)
         self.update_temp_labels()
         self.send_message()
-        
+
     def on_success(self, request, result):
         print("Received data:", result)
         self.web_update_temp(result)
@@ -353,6 +353,10 @@ class SmartFanApp(App):
         app = App.get_running_app()
         app.root.clear_widgets()
         app.root.add_widget(app.build())
+
+    def fan_power(self, instance):
+        output = bytes("power", 'utf-8')
+        self.server_socket.sendall(output)
    
     def send_message(self):
         # Base URL of the server
@@ -373,6 +377,17 @@ class SmartFanApp(App):
         # Send the request
         with urllib.request.urlopen(req) as response:
             response = response.read().decode('utf-8')
+            
+    def get_prediction(self):
+        fan_state = False
+        while True:
+            if self.prediction.predict() and not fan_state:
+                fan_state = True
+                self.fan_power()
+            if not self.prediction.predict() and fan_state:
+                fan_state = False
+                self.fan_power()
+            time.sleep(540)
             
     def update_inside_temp(self):
         while True:
@@ -415,7 +430,6 @@ class SmartFanApp(App):
         self.min = results.get('minutesValue')
         self.update_time_labels()
             
-
 
 
 def run():

@@ -66,22 +66,22 @@ class SmartFanApp(App):
         self.min = 0
         self.sched_list = []
         self.sched_label_list = []
-        self.forecast = Forecast()
+        #self.forecast = Forecast()
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
         self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, self.forecast)
         self.acctemp_array = self.forecast.getTemperatureFahrenheit()
-        #self.acctemp_array = [32, 30, 29, 28, 30, 31, 32, 29, 33, 25, 31, 33]
+        self.acctemp_array = [32, 30, 29, 28, 30, 31, 32, 29, 33, 25, 31, 33]
         self.acc_temp = self.acctemp_array[0]
-        #self.acc_temp = 30
-        self.in_temp  = 0
+        self.in_temp = 0
         self.out_temp = 0
         
-        t1 = threading.Thread(target=self.get_prediction)
-        t1.start()
+        #t1 = threading.Thread(target=self.get_prediction)
+        #t1.start()
 
         # # Conn
-        HOST = '192.168.1.161'    # The remote host
+        #HOST = '192.168.1.161'    # The remote host
+        HOST = '10.24.0.32'
         PORT = 50007              # The same port as used by the server
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.connect((HOST, PORT))
@@ -204,10 +204,10 @@ class SmartFanApp(App):
 
         layout.add_widget(temperature_layout)
         
-        it_thread = threading.Thread(target=self.update_inside_temp)
-        it_thread.start()
-        ot_thread = threading.Thread(target=self.update_outside_temp)
-        ot_thread.start()
+        #it_thread = threading.Thread(target=self.update_inside_temp)
+        #it_thread.start()
+        #ot_thread = threading.Thread(target=self.update_outside_temp)
+        #ot_thread.start()
 
         return layout
  
@@ -216,6 +216,7 @@ class SmartFanApp(App):
         # Make a GET request
         # url = 'http://10.3.62.239:8000/data'
         url = 'http://192.168.1.18:8000/data'
+
         self.request = UrlRequest(url, on_success=self.on_success, on_failure=self.on_failure)
 
     def on_success(self, request, result):
@@ -239,27 +240,27 @@ class SmartFanApp(App):
 
     def on_min_temp_dec_press(self, instance):
         self.min_temp -= 1
-        self.prediction.update_range_min(self.min_temp)
+        #self.prediction.update_range_min(self.min_temp)
         self.update_temp_labels()
         self.send_message()
 
     def on_min_temp_inc_press(self, instance):
         if self.min_temp < self.max_temp:
             self.min_temp += 1
-            self.prediction.update_range_min(self.min_temp)
+            #self.prediction.update_range_min(self.min_temp)
             self.update_temp_labels()
             self.send_message()
 
     def on_max_temp_dec_press(self, instance):
         if self.min_temp < self.max_temp:
             self.max_temp -= 1
-            self.prediction.update_range_max(self.max_temp)
+            #self.prediction.update_range_max(self.max_temp)
             self.update_temp_labels()
             self.send_message()
 
     def on_max_temp_inc_press(self, instance):
         self.max_temp += 1
-        self.prediction.update_range_max(self.max_temp)
+        #self.prediction.update_range_max(self.max_temp)
         self.update_temp_labels()
         self.send_message()
 
@@ -374,7 +375,7 @@ class SmartFanApp(App):
                 fan_state = False
                 self.fan_power()
             time.sleep(540)
-            
+                        
     def update_inside_temp(self):
         while True:
             asyncio.run(self.in_climate.sensorClient())
