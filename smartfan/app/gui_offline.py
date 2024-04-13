@@ -26,7 +26,7 @@ def define_argparser(command_parser: _SubParsersAction):
     p = command_parser.add_parser(
         'run_offline', help='run smartfan app')
 
-    p.set_defaults(handler=lambda args: run())
+    p.set_defaults(handler=lambda args: run_offline())
 
 class SmartFanApp(App):
     Window.clearcolor = (1, 1, 1, 1)
@@ -371,7 +371,7 @@ class SmartFanApp(App):
         self.update_time_labels()
 
 
-def run():
+def run_offline():
     #os.popen('xset dpms 30 30 30')  # Set screen blanking to 15 seconds
     
     # Set window to full screen
