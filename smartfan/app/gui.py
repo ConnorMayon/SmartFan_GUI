@@ -60,9 +60,10 @@ class SmartFanApp(App):
         #t1.start()
 
         # # Conn
-        #HOST = '192.168.1.161'    # The remote host
-        HOST = '10.3.62.253'
-        PORT = 8000            # The same port as used by the server
+        HOST = '192.168.1.161'    # The remote host
+        #HOST = '10.3.62.253'
+        PORT = 50007
+        #PORT = 8000            # The same port as used by the server
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.connect((HOST, PORT))
 
@@ -171,8 +172,8 @@ class SmartFanApp(App):
 
     def make_request(self, instance):
         # Make a GET request
-        url = 'http://10.3.62.253:8000/data'
-        #url = 'http://192.168.1.18:8000/data'
+        #url = 'http://10.3.62.253:8000/data'
+        url = 'http://192.168.1.18:8000/data'
 
         self.request = UrlRequest(url, on_success=self.on_success, on_failure=self.on_failure)
 
@@ -298,8 +299,8 @@ class SmartFanApp(App):
    
     def send_message(self):
         # Base URL of the server
-        url = 'http://10.3.62.253:8000/log'
-        #url = 'http://192.168.1.18:8000/log'
+        #url = 'http://10.3.62.253:8000/log'
+        url = 'http://192.168.1.18:8000/log'
 
         # Construct the query string
         query_params = urllib.parse.urlencode({
@@ -368,12 +369,12 @@ def run():
     
     # Set window to full screen
     # PUT THESE BACK BEFORE MERGE
-    # Config.set('graphics', 'fullscreen', 'auto')
-    # Config.set('graphics', 'window_state', 'maximized')
-    # Config.write()
-    Config.set('graphics', 'fullscreen', '0')
-    Config.set('graphics', 'window_state', 'normal')
+    Config.set('graphics', 'fullscreen', 'auto')
+    Config.set('graphics', 'window_state', 'maximized')
     Config.write()
+    #Config.set('graphics', 'fullscreen', '0')
+    #Config.set('graphics', 'window_state', 'normal')
+    #Config.write()
 
     
     SmartFanApp().run()
