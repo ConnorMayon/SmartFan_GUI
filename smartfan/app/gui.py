@@ -166,6 +166,7 @@ class SmartFanApp(App):
         alg_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(620, 65), size_hint=(None, None), size=(70, 60), on_press=self.on_cd_timer_dec_press)
         layout.add_widget(alg_dec_button)
         
+        acc_thread = threading.Thread(target=self.update_acc_weather).start()
         it_thread = threading.Thread(target=self.update_inside_temp).start()
         ot_thread = threading.Thread(target=self.update_outside_temp).start()
         pred_thread = threading.Thread(target=self.get_prediction).start()
@@ -325,9 +326,11 @@ class SmartFanApp(App):
             response = response.read().decode('utf-8')
             
     def update_acc_weather(self):
-        acctemp_array = self.prediction.get_accuweather_temps
-        self.acc_temp = self.acctemp_array[0]
-        self.acc_label.text = str(round(self.acc_temp, 2))
+        while True:
+            acctemp_array = self.prediction.get_accuweather_temps
+            self.acc_temp = self.acctemp_array[0]
+            self.acc_label.text = str(round(self.acc_temp, 2))
+            time.sleep(3600)
 
     def update_temp_labels(self):
         if self.min_temp_label:
