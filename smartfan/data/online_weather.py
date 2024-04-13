@@ -1,20 +1,14 @@
 import asyncio
-import logging
 import time
 
-from aiohttp import ClientError, ClientSession
+from aiohttp import ClientSession
 
-from accuweather import (
-    AccuWeather,
-    ApiError,
-    InvalidApiKeyError,
-    InvalidCoordinatesError,
-    RequestsExceededError,
-)
+from accuweather import AccuWeather
+
 
 #for use with accuweather API
-API_KEY = "boA10L9ACMVoFVfUXykXE6G9hiiEPxGr"
-#API_KEY = "RF9tFJCOIfkgstYMM5nVH11GUeNYdIne"
+#API_KEY = "boA10L9ACMVoFVfUXykXE6G9hiiEPxGr"
+API_KEY = "RF9tFJCOIfkgstYMM5nVH11GUeNYdIne"
 
 class Forecast:
     def __init__(self, curr_time = time.localtime(), latitude = 35.198284, longitude = -111.651299):

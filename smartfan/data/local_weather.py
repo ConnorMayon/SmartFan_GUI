@@ -5,7 +5,7 @@ import time
 import asyncio
 import logging
 
-from bleak import BleakClient, BleakScanner
+from bleak import BleakScanner
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -114,8 +114,6 @@ class Climate:
     def getLocal(self):
         #method to return the location of the sensor (indoors or outdoors)
         return self.location
-
-test_bed_BT = Climate("Indoors", "44:fe:00:00:0e:d5")
 
 #BT Device 1
 #44:fe:00:00:0e:d5: ThermoBeacon
