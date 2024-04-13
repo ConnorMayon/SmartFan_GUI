@@ -2,15 +2,18 @@ from kivy.app import App
 from kivy.config import Config
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.core.window import Window
 from kivy.network.urlrequest import UrlRequest
+from kivy.uix.floatlayout import FloatLayout
+from kivy.clock import Clock
 from smartfan.data.local_weather import Climate
+from smartfan.data.online_weather import Forecast
 from smartfan.prediction.prediction import Prediction
 import urllib.parse
 import urllib.request
 import threading
-import os
 import time
 import asyncio
 import socket
