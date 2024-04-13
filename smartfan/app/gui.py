@@ -91,6 +91,9 @@ class SmartFanApp(App):
 
         self.min_temp_label = Label(color=[0, 0, 0, 1], text=str(self.min_temp), pos=(65, 300), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.min_temp_label)
+        
+        self.hyphen_label = Label(color=[0, 0, 0, 1], text='-', pos=(112, 300), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(self.hyphen_label)
 
         self.max_temp_label = Label(color=[0, 0, 0, 1], text=str(self.max_temp), pos=(170, 300), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.max_temp_label)
@@ -112,6 +115,9 @@ class SmartFanApp(App):
 
         self.hour_label = Label(color=[0, 0, 0, 1], text=str(self.hour), pos=(290, 300), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.hour_label)
+        
+        self.colon_label = Label(color=[0, 0, 0, 1], text=':', pos=(327, 300), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(self.colon_label)
 
         self.ten_label = Label(color=[0, 0, 0, 1], text=str(self.ten), pos=(365, 300), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.ten_label)
