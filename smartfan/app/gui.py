@@ -43,7 +43,7 @@ class SmartFanApp(App):
         self.hour = 5
         self.ten = 0
         self.min = 0
-        self.web_is_pressed=True
+        self.web_is_pressed = "true"
         self.cd_timer = 1
         self.sched_list = []
         self.sched_label_list = []
@@ -380,7 +380,7 @@ class SmartFanApp(App):
     def web_update_temp(self, results):
         self.web_is_pressed = results.get('latestResult')
         self.web_press.text = str(self.web_is_pressed)
-        if self.web_is_pressed == True:
+        if self.web_is_pressed == "true":
             self.min_temp = results.get('minTempValue')
             self.max_temp = results.get('maxTempValue')
             self.update_temp_labels()
@@ -388,7 +388,7 @@ class SmartFanApp(App):
     def web_update_time(self, results):
         self.web_is_pressed = results.get('latestResult')
         self.web_press.text = str(self.web_is_pressed)
-        if self.web_is_pressed == True:
+        if self.web_is_pressed == "true":
             self.hour = results.get('hoursValue')
             self.ten = results.get('tenMinutesValue')
             self.min = results.get('minutesValue')
