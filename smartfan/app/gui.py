@@ -159,7 +159,7 @@ class SmartFanApp(App):
         self.out_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(485, 125), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.out_label)
         
-        self.res = Label(color=[0, 0, 0, 1], text="Res", pos=(385, 75), size_hint=(None, None), size=(70, 60))
+        self.res = Label(color=[0, 0, 0, 1], text="Res", pos=(385, 5), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.res)
         
         self.web_press = Label(color=[0, 0, 0, 1], text=str(self.web_is_pressed), pos=(485, 75), size_hint=(None, None), size=(70, 60))
