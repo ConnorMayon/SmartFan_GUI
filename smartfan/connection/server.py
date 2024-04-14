@@ -16,7 +16,7 @@ class CustomHandler(BaseHTTPRequestHandler):
         'hoursValue': 5,
         'tenMinutesValue': 0,
         'minutesValue': 0,
-        'latestSend': False
+        'latestSend': "false"
     }
 
     def _set_headers(self, content_type='text/plain', response_type=200):
@@ -74,7 +74,7 @@ class CustomHandler(BaseHTTPRequestHandler):
             print(CustomHandler.kivyData)
             self._set_headers()
             self.wfile.write(b'Data received successfully')
-            CustomHandler.time_values['latestSend'] = False
+            CustomHandler.time_values['latestSend'] = "false"
         else:
             self.send_error(404, 'File Not Found: %s' % self.path)
 
@@ -90,7 +90,7 @@ class CustomHandler(BaseHTTPRequestHandler):
             CustomHandler.time_values['minutesValue'] = parsed_data['minutesValue']
             self._set_headers()
             self.wfile.write(b'Values updated successfully')
-            CustomHandler.time_values['latestSend'] = True
+            CustomHandler.time_values['latestSend'] = "true"
             print(CustomHandler.temperatures)
             print(CustomHandler.time_values)
         else:
