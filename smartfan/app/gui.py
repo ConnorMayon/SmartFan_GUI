@@ -57,8 +57,8 @@ class SmartFanApp(App):
         self.user_pressed = False
 
         # # Conn
-        #HOST = '192.168.1.161'    # The remote host
-        HOST = '10.3.62.245'
+        HOST = '192.168.1.161'    # The remote host
+        #HOST = '10.3.62.245'
         PORT = 50007
         #PORT = 8000            # The same port as used by the server
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -204,8 +204,8 @@ class SmartFanApp(App):
 
     def make_request(self, instance):
         # Make a GET request
-        url = 'http://10.3.62.245:8000/data'
-        #url = 'http://192.168.1.18:8000/data'
+        #url = 'http://10.3.62.245:8000/data'
+        url = 'http://192.168.1.18:8000/data'
 
         self.request = UrlRequest(url, on_success=self.on_request_success, on_failure=self.on_request_failure)
         
@@ -315,8 +315,8 @@ class SmartFanApp(App):
    
     def send_message(self):
         # Base URL of the server
-        url = 'http://10.3.62.245:8000/log'
-        #url = 'http://192.168.1.18:8000/log'
+        #url = 'http://10.3.62.245:8000/log'
+        url = 'http://192.168.1.18:8000/log'
 
         # Construct the query string
         query_params = urllib.parse.urlencode({
