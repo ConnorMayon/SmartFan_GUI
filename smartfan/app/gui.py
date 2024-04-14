@@ -43,7 +43,7 @@ class SmartFanApp(App):
         self.hour = 5
         self.ten = 0
         self.min = 0
-        self.web_is_pressed=False
+        self.web_is_pressed=True
         self.cd_timer = 1
         self.sched_list = []
         self.sched_label_list = []
@@ -158,6 +158,9 @@ class SmartFanApp(App):
 
         self.out_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(485, 125), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.out_label)
+        
+        self.web_press = Label(color=[0, 0, 0, 1], text=str(self.web_is_pressed), pos=(485, 75), size_hint=(None, None), size=(70, 60))
+        layout.add_widget(self.web_press)
 
         self.alg_label = Label(color=[0, 0, 0, 1], text="Algorithm Timeout", pos=(620, 235), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.alg_label)
@@ -372,6 +375,7 @@ class SmartFanApp(App):
             
     def web_update_temp(self, results):
         self.web_is_pressed = results.get('latestResult')
+        self.web_press.text = str(self.web_is_pressed)
         if self.web_is_pressed == True:
             self.min_temp = results.get('minTempValue')
             self.max_temp = results.get('maxTempValue')
@@ -379,6 +383,7 @@ class SmartFanApp(App):
 
     def web_update_time(self, results):
         self.web_is_pressed = results.get('latestResult')
+        self.web_press.text = str(self.web_is_pressed)
         if self.web_is_pressed == True:
             self.hour = results.get('hoursValue')
             self.ten = results.get('tenMinutesValue')
