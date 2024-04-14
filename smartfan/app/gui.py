@@ -68,7 +68,7 @@ class SmartFanApp(App):
         #Clock.schedule_once(self.update_acc_weather, 0)
 
         #repeated every 10 minutes
-        #Clock.schedule_interval(self.make_request, 5)
+        Clock.schedule_interval(self.make_request, 5)
         #Clock.schedule_interval(self.update_acc_weather, 3600)
 
         layout = FloatLayout()
@@ -181,7 +181,7 @@ class SmartFanApp(App):
         it_thread = threading.Thread(target=self.update_inside_temp).start()
         ot_thread = threading.Thread(target=self.update_outside_temp).start()
         pred_thread = threading.Thread(target=self.get_prediction).start()
-        update_thread = threading.Thread(target=self.make_request).start()
+        #update_thread = threading.Thread(target=self.make_request).start()
 
         return layout
     
@@ -213,9 +213,7 @@ class SmartFanApp(App):
         #url = 'http://10.3.62.245:8000/data'
         url = 'http://192.168.1.18:8000/data'
 
-        while True:
-            time.sleep(5)
-            self.request = UrlRequest(url, on_success=self.on_request_success, on_failure=self.on_request_failure)
+        self.request = UrlRequest(url, on_success=self.on_request_success, on_failure=self.on_request_failure)
         
     def on_cd_timer_dec_press(self, instance):
         self.cd_timer -= 1
