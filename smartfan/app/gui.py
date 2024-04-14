@@ -43,6 +43,7 @@ class SmartFanApp(App):
         self.hour = 5
         self.ten = 0
         self.min = 0
+        self.web_is_pressed=False
         self.cd_timer = 1
         self.sched_list = []
         self.sched_label_list = []
@@ -56,10 +57,10 @@ class SmartFanApp(App):
         self.user_pressed = False
 
         # # Conn
-        HOST = '192.168.1.161'    # The remote host
-        #HOST = '10.3.62.253'
-        PORT = 50007
-        #PORT = 8000            # The same port as used by the server
+        #HOST = '192.168.1.161'    # The remote host
+        HOST = '10.3.62.245'
+        #PORT = 50007
+        PORT = 8000            # The same port as used by the server
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.connect((HOST, PORT))
 
@@ -203,8 +204,8 @@ class SmartFanApp(App):
 
     def make_request(self, instance):
         # Make a GET request
-        #url = 'http://10.3.62.253:8000/data'
-        url = 'http://192.168.1.18:8000/data'
+        url = 'http://10.3.62.245:8000/data'
+        #url = 'http://192.168.1.18:8000/data'
 
         self.request = UrlRequest(url, on_success=self.on_request_success, on_failure=self.on_request_failure)
         
@@ -314,8 +315,8 @@ class SmartFanApp(App):
    
     def send_message(self):
         # Base URL of the server
-        #url = 'http://10.3.62.253:8000/log'
-        url = 'http://192.168.1.18:8000/log'
+        url = 'http://10.3.62.245:8000/log'
+        #url = 'http://192.168.1.18:8000/log'
 
         # Construct the query string
         query_params = urllib.parse.urlencode({
@@ -370,15 +371,19 @@ class SmartFanApp(App):
             time.sleep(1)
             
     def web_update_temp(self, results):
-        self.min_temp = results.get('minTempValue')
-        self.max_temp = results.get('maxTempValue')
-        self.update_temp_labels()
+        self.web_is_pressed = results.get('latestResult')
+        if self.web_is_pressed == True:
+            self.min_temp = results.get('minTempValue')
+            self.max_temp = results.get('maxTempValue')
+            self.update_temp_labels()
 
     def web_update_time(self, results):
-        self.hour = results.get('hoursValue')
-        self.ten = results.get('tenMinutesValue')
-        self.min = results.get('minutesValue')
-        self.update_time_labels()
+        self.web_is_pressed = results.get('latestResult')
+        if self.web_is_pressed == True:
+            self.hour = results.get('hoursValue')
+            self.ten = results.get('tenMinutesValue')
+            self.min = results.get('minutesValue')
+            self.update_time_labels()
 
 
 def run():
