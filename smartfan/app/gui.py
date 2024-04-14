@@ -378,7 +378,7 @@ class SmartFanApp(App):
             time.sleep(1)
             
     def web_update_temp(self, results):
-        self.web_is_pressed = results.get('latestResult')
+        self.web_is_pressed = results.get('latestSend')
         self.web_press.text = str(self.web_is_pressed)
         if self.web_is_pressed == "true":
             self.min_temp = results.get('minTempValue')
@@ -386,9 +386,9 @@ class SmartFanApp(App):
             self.update_temp_labels()
 
     def web_update_time(self, results):
-        self.web_is_pressed = results.get('latestResult')
+        self.web_is_pressed = results.get('latestSend')
         self.web_press.text = str(self.web_is_pressed)
-        if self.web_is_pressed == "true":
+        if self.web_is_pressed:
             self.hour = results.get('hoursValue')
             self.ten = results.get('tenMinutesValue')
             self.min = results.get('minutesValue')
