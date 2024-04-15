@@ -380,7 +380,7 @@ class SmartFanApp(App):
     def web_update_temp(self, results):
         self.web_is_pressed = results.get('latestSend')
         self.web_press.text = str(self.web_is_pressed)
-        if self.web_is_pressed == "true":
+        if self.web_is_pressed:
             self.min_temp = results.get('minTempValue')
             self.max_temp = results.get('maxTempValue')
             self.update_temp_labels()
