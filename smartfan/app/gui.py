@@ -68,7 +68,7 @@ class SmartFanApp(App):
         #Clock.schedule_once(self.update_acc_weather, 0)
 
         #repeated every 10 minutes
-        Clock.schedule_interval(self.make_request, 5)
+        Clock.schedule_interval(self.make_request, 1)
         #Clock.schedule_interval(self.update_acc_weather, 3600)
 
         layout = FloatLayout()
