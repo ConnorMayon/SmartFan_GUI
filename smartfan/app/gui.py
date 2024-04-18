@@ -350,7 +350,7 @@ class SmartFanApp(App):
         if self.min_temp_label:
             self.min_temp_label.text = str(self.min_temp)
         if self.max_temp_label:
-            self.max_temp_label.text = str(self.max_temp)\
+            self.max_temp_label.text = str(self.max_temp)
         if self.hour_label:
             self.hour_label.text = str(self.hour)
         if self.ten_label:
