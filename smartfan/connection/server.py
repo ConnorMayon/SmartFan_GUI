@@ -4,8 +4,7 @@ import urllib.request
 import json
 import os
 
-
-class CustomHandler(BaseHTTPRequestHandler):
+class CustomHandlerData(BaseHTTPRequestHandler):
     kivyData = {}
     #variables that are updated and sent in POST so web server can send to KIVY
     temperatures = {
@@ -19,6 +18,7 @@ class CustomHandler(BaseHTTPRequestHandler):
         'latestSend': False
     }
 
+class CustomHandler(CustomHandlerData):
     def _set_headers(self, content_type='text/plain', response_type=200):
         self.send_response(response_type)
         self.send_header('Content-type', content_type)
