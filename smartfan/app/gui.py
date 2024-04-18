@@ -302,7 +302,8 @@ class SmartFanApp(App):
     def on_request_success(self, request, result):
         self.res.text = str(result)
         print("Received data:", result)
-        self.web_update_vals(result)
+        self.web_update_temp(result)
+        self.web_update_time(result)
 
     def save_time(self, instance):
         time_value = f"{self.hour:02}:{self.ten}{self.min}"
@@ -346,11 +347,13 @@ class SmartFanApp(App):
             self.acc_label.text = str(round(self.acc_temp, 2))
             time.sleep(3600)
 
-    def update_labels(self):
+    def update_temp_labels(self):
         if self.min_temp_label:
             self.min_temp_label.text = str(self.min_temp)
         if self.max_temp_label:
             self.max_temp_label.text = str(self.max_temp)
+
+    def update_time_labels(self):
         if self.hour_label:
             self.hour_label.text = str(self.hour)
         if self.ten_label:
@@ -374,17 +377,23 @@ class SmartFanApp(App):
                 self.out_label.text = str(self.out_temp)
             time.sleep(1)
             
-    def web_update_vals(self, results):
+    def web_update_temp(self, results):
         self.web_is_pressed = results.get('latestSend')
         self.web_press.text = str(self.web_is_pressed)
         if self.web_is_pressed:
             self.min_temp = results.get('minTempValue')
             self.max_temp = results.get('maxTempValue')
+            self.update_temp_labels()
+
+    def web_update_time(self, results):
+        self.web_is_pressed = results.get('latestSend')
+        self.web_press.text = str(self.web_is_pressed)
+        if self.web_is_pressed:
             self.hour = results.get('hoursValue')
             self.ten = results.get('tenMinutesValue')
             self.min = results.get('minutesValue')
-            self.update_labels()
-            
+            self.update_time_labels()
+
 
 def run():
     #os.popen('xset dpms 30 30 30')  # Set screen blanking to 15 seconds
