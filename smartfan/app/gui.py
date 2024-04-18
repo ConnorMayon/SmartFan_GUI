@@ -300,9 +300,11 @@ class SmartFanApp(App):
         print("Request failed:", error)
         
     def on_request_success(self, request, result):
-        self.res.text = str(result)
+        self.res.text = str(result) #DEBUG
         print("Received data:", result)
-        self.web_update_vals(result)
+        self.web_is_pressed = result.get('latestSend')
+        if self.web_is_pressed:
+            self.web_update_vals(result)
 
     def save_time(self, instance):
         time_value = f"{self.hour:02}:{self.ten}{self.min}"
@@ -375,15 +377,13 @@ class SmartFanApp(App):
             time.sleep(1)
             
     def web_update_vals(self, results):
-        self.web_is_pressed = results.get('latestSend')
-        self.web_press.text = str(self.web_is_pressed)
-        if self.web_is_pressed:
-            self.min_temp = results.get('minTempValue')
-            self.max_temp = results.get('maxTempValue')
-            self.hour = results.get('hoursValue')
-            self.ten = results.get('tenMinutesValue')
-            self.min = results.get('minutesValue')
-            self.update_labels()
+        self.web_press.text = str(self.web_is_pressed) #DEBUG
+        self.min_temp = results.get('minTempValue')
+        self.max_temp = results.get('maxTempValue')
+        self.hour = results.get('hoursValue')
+        self.ten = results.get('tenMinutesValue')
+        self.min = results.get('minutesValue')
+        self.update_labels()
             
 
 def run():
