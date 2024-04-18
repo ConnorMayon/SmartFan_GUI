@@ -231,69 +231,69 @@ class SmartFanApp(App):
     def on_min_temp_dec_press(self, instance):
         self.min_temp -= 1
         #self.prediction.update_range_min(self.min_temp)
-        self.update_labels()
+        self.update_temp_labels()
         self.send_message()
 
     def on_min_temp_inc_press(self, instance):
         if self.min_temp < self.max_temp:
             self.min_temp += 1
             #self.prediction.update_range_min(self.min_temp)
-            self.update_labels()
+            self.update_temp_labels()
             self.send_message()
 
     def on_max_temp_dec_press(self, instance):
         if self.min_temp < self.max_temp:
             self.max_temp -= 1
             #self.prediction.update_range_max(self.max_temp)
-            self.update_labels()
+            self.update_temp_labels()
             self.send_message()
 
     def on_max_temp_inc_press(self, instance):
         self.max_temp += 1
         #self.prediction.update_range_max(self.max_temp)
-        self.update_labels()
+        self.update_temp_labels()
         self.send_message()
         
     def on_hour_dec_press(self, instance):
         self.hour -= 1
         if self.hour == -1:
             self.hour = 23
-        self.update_labels()
+        self.update_time_labels()
         self.send_message()
 
     def on_hour_inc_press(self, instance):
         self.hour += 1
         if self.hour == 24:
             self.hour = 0
-        self.update_labels()
+        self.update_time_labels()
         self.send_message()
 
     def on_ten_dec_press(self, instance):
         self.ten -= 1
         if self.ten == -1:
             self.ten = 5
-        self.update_labels()
+        self.update_time_labels()
         self.send_message()
 
     def on_ten_inc_press(self, instance):
         self.ten += 1
         if self.ten == 6:
             self.ten = 0
-        self.update_labels()
+        self.update_time_labels()
         self.send_message()
 
     def on_min_dec_press(self, instance):
         self.min -= 1
         if self.min == -1:
             self.min = 9
-        self.update_labels()
+        self.update_time_labels()
         self.send_message()
 
     def on_min_inc_press(self, instance):
         self.min += 1
         if self.min == 10:
             self.min = 0
-        self.update_labels()
+        self.update_time_labels()
         self.send_message()
         
     def on_request_failure(self, request, error):
@@ -302,9 +302,7 @@ class SmartFanApp(App):
     def on_request_success(self, request, result):
         self.res.text = str(result)
         print("Received data:", result)
-        self.web_is_pressed = result.get('latestSend')
-        if self.web_is_pressed:
-            self.web_update_vals(result)
+        self.web_update_vals(result)
 
     def save_time(self, instance):
         time_value = f"{self.hour:02}:{self.ten}{self.min}"
@@ -377,12 +375,15 @@ class SmartFanApp(App):
             time.sleep(1)
             
     def web_update_vals(self, results):
-        self.min_temp = results.get('minTempValue')
-        self.max_temp = results.get('maxTempValue')
-        self.hour = results.get('hoursValue')
-        self.ten = results.get('tenMinutesValue')
-        self.min = results.get('minutesValue')
-        self.update_labels()
+        self.web_is_pressed = results.get('latestSend')
+        self.web_press.text = str(self.web_is_pressed)
+        if self.web_is_pressed:
+            self.min_temp = results.get('minTempValue')
+            self.max_temp = results.get('maxTempValue')
+            self.hour = results.get('hoursValue')
+            self.ten = results.get('tenMinutesValue')
+            self.min = results.get('minutesValue')
+            self.update_labels()
             
 
 def run():
