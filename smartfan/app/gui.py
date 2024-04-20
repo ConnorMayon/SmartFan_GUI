@@ -12,6 +12,7 @@ from smartfan.data.local_weather import Climate
 from smartfan.prediction.prediction import Prediction
 from smartfan.data.online_weather import Forecast
 from argparse import _SubParsersAction
+from threading import Thread
 import urllib.parse
 import urllib.request
 import time
@@ -185,12 +186,11 @@ class SmartFanApp(App):
         alg_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(620, 65), size_hint=(None, None), size=(70, 60), on_press=self.on_cd_timer_dec_press)
         layout.add_widget(alg_dec_button)
         
-        Clock.schedule_interval(self.update_inside_temp, 1)
-        Clock.schedule_interval(self.update_outside_temp, 1)
+        Thread(target=self.update_inside_temp).start()
+        Thread(target=self.update_outside_temp).start()
         if self.online:
-            Clock.schedule_interval(self.update_acc_weather, 3600)
-        if self.user_pressed:
-            Clock.schedule_interval(self.get_prediction, self.cd_timer * 60)
+            Thread(target=self.update_acc_weather).start()
+        Thread(target=self.get_prediction).start()
         Clock.schedule_interval(self.make_request, 1)
 
         return layout
@@ -352,10 +352,12 @@ class SmartFanApp(App):
             response = response.read().decode('utf-8')
             
     def update_acc_weather(self):
-        acctemp_array = self.prediction.get_accuweather_temps
-        self.acc_temp = self.acctemp_array[0]
-        if self.acc_temp != None:
-            self.acc_label.text = str(round(self.acc_temp, 2))
+        while True:
+            acctemp_array = self.prediction.get_accuweather_temps
+            self.acc_temp = self.acctemp_array[0]
+            if self.acc_temp != None:
+                self.acc_label.text = str(round(self.acc_temp, 2))
+            time.sleep(3600)
 
     def update_labels(self):
         if self.min_temp_label:
@@ -370,16 +372,20 @@ class SmartFanApp(App):
             self.min_label.text = str(self.min)
                         
     def update_inside_temp(self):
-        asyncio.run(self.in_climate.sensorClient())
-        self.in_temp  = self.in_climate.getTempF()
-        if self.in_label:
-            self.in_label.text = str(self.in_temp)
+        while True:
+            asyncio.run(self.in_climate.sensorClient())
+            self.in_temp  = self.in_climate.getTempF()
+            if self.in_label:
+                self.in_label.text = str(self.in_temp)
+            time.sleep(1)
             
     def update_outside_temp(self):
-        asyncio.run(self.out_climate.sensorClient())
-        self.out_temp = self.out_climate.getTempF()
-        if self.out_label:
-            self.out_label.text = str(self.out_temp)
+        while True:
+            asyncio.run(self.out_climate.sensorClient())
+            self.out_temp = self.out_climate.getTempF()
+            if self.out_label:
+                self.out_label.text = str(self.out_temp)
+            time.sleep(1)
             
     def web_update_vals(self, results):
         self.web_press.text = str(self.web_is_pressed) #DEBUG
