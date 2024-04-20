@@ -69,7 +69,6 @@
         <button onclick="saveTime()">Save Time</button>
         <button onclick="switchPage()">Switch Page</button>
         <button onclick="fanPower()">Fan ON/OFF</button>
-        <button onclick="fetchData()">Update</button>
     </div>
 
     <script>
@@ -182,6 +181,9 @@
                 let tenVal = data.tenVal;
                 let minVal = data.minVal;
                 let latestSend = data.latestSend;
+
+                console.log(minVal)
+                console.log(latestSend)
 
                 if (latestSend) {
                     return;

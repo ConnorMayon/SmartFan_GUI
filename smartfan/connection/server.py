@@ -76,6 +76,7 @@ class CustomHandler(BaseHTTPRequestHandler):
             self._set_headers()
             #self.wfile.write(b'Data received successfully')
             CustomHandler.time_values['latestSend'] = False
+            CustomHandler.kivyData['latestSend'] = False
         else:
             self.send_error(404, 'File Not Found: %s' % self.path)
 
@@ -92,6 +93,7 @@ class CustomHandler(BaseHTTPRequestHandler):
             self._set_headers()
             #self.wfile.write(b'Values updated successfully')
             CustomHandler.time_values['latestSend'] = True
+            CustomHandler.kivyData['latestSend'] = True
             print(CustomHandler.temperatures)
             print(CustomHandler.time_values)
         else:

@@ -43,7 +43,7 @@ class SmartFanApp(App):
         self.hour = 5
         self.ten = 0
         self.min = 0
-        self.web_is_pressed = "true"
+        self.web_is_pressed = True
         self.cd_timer = 1
         self.sched_list = []
         self.sched_label_list = []
