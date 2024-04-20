@@ -390,7 +390,7 @@ class SmartFanApp(App):
             
 
 def run():
-    #os.popen('xset dpms 30 30 30')  # Set screen blanking to 15 seconds
+    os.popen('xset dpms 30 30 30')  # Set screen blanking to 15 seconds
     
     # Set window to full screen
     # PUT THESE BACK BEFORE MERGE
@@ -405,6 +405,8 @@ def run():
     SmartFanApp(True).run()
 
 def run_offline():
+    os.popen('xset dpms 30 30 30')  # Set screen blanking to 15 seconds
+
     # Set window to full screen
     Config.set('graphics', 'fullscreen', 'auto')
     Config.set('graphics', 'window_state', 'maximized')
