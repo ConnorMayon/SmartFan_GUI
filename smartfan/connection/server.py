@@ -1,4 +1,5 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
+from socketserver import ThreadingMixIn
 import urllib
 import urllib.request
 import json
@@ -18,7 +19,20 @@ class CustomHandlerData(BaseHTTPRequestHandler):
         'latestSend': False
     }
 
-class CustomHandler(CustomHandlerData):
+class CustomHandler(BaseHTTPRequestHandler):
+    kivyData = {}
+    #variables that are updated and sent in POST so web server can send to KIVY
+    temperatures = {
+        'minTempValue': 65,
+        'maxTempValue': 85
+    }
+    time_values = {
+        'hoursValue': 5,
+        'tenMinutesValue': 0,
+        'minutesValue': 0,
+        'latestSend': False
+    }
+    
     def _set_headers(self, content_type='text/plain', response_type=200):
         self.send_response(response_type)
         self.send_header('Content-type', content_type)
@@ -99,7 +113,7 @@ class CustomHandler(CustomHandlerData):
 if __name__ == "__main__":
     PORT = 8000
     server_address = ('', PORT)
-    httpd = HTTPServer(server_address, CustomHandler)
+    httpd = ThreadingHTTPServer(server_address, CustomHandler)
     print('Server running at port', PORT)
     try:
         httpd.serve_forever()
