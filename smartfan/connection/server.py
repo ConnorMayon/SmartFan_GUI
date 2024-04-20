@@ -7,7 +7,7 @@ import os
 
 
 class CustomHandler(BaseHTTPRequestHandler):
-    kivyData = {"minTemp": 65, "maxTemp": 85, "hourVal": 5, "tenVal": 0, "minVal": 0, 'latestSend': False}
+    kivyData = {"minTemp": 65, "maxTemp": 85, "hourVal": 5, "tenVal": 0, "minVal": 0, 'latestSend': False, 'fanState': False}
     #variables that are updated and sent in POST so web server can send to KIVY
     temperatures = {
         'minTempValue': 65,
@@ -19,6 +19,7 @@ class CustomHandler(BaseHTTPRequestHandler):
         'minutesValue': 0,
         'latestSend': False
     }
+    fanState = False
     
     def _set_headers(self, content_type='text/plain', response_type=200):
         self.send_response(response_type)
@@ -71,7 +72,8 @@ class CustomHandler(BaseHTTPRequestHandler):
             hourVal=parsed_data.get('hour')[0]
             tenVal=parsed_data.get('ten')[0]
             minVal=parsed_data.get('minute')[0]
-            CustomHandler.kivyData=({"minTemp": minTemp, "maxTemp": maxTemp, "hourVal": hourVal, "tenVal": tenVal, "minVal": minVal})
+            fanState=parsed_data.get('fan_state')[0]
+            CustomHandler.kivyData=({"minTemp": minTemp, "maxTemp": maxTemp, "hourVal": hourVal, "tenVal": tenVal, "minVal": minVal, "fanState": fanState})
             print(CustomHandler.kivyData)
             self._set_headers()
             #self.wfile.write(b'Data received successfully')
@@ -90,6 +92,7 @@ class CustomHandler(BaseHTTPRequestHandler):
             CustomHandler.time_values['hoursValue'] = parsed_data['hoursValue']
             CustomHandler.time_values['tenMinutesValue'] = parsed_data['tenMinutesValue']
             CustomHandler.time_values['minutesValue'] = parsed_data['minutesValue']
+            CustomHandler.fanState = parsed_data['fanState']
             self._set_headers()
             #self.wfile.write(b'Values updated successfully')
             CustomHandler.time_values['latestSend'] = True
