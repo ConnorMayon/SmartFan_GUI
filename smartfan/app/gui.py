@@ -191,7 +191,6 @@ class SmartFanApp(App):
         output = bytes("power", 'utf-8')
         #self.server_socket.sendall(output)
         self.fan_state = not self.fan_state
-        self.send_message()
         if instance != None:
             self.user_pressed = True
     
@@ -334,8 +333,7 @@ class SmartFanApp(App):
         'max_temp': self.max_temp,
         'hour': self.hour,
         'ten': self.ten,
-        'minute': self.min,
-        'fan_state': self.fan_state
+        'minute': self.min
         }).encode('utf-8')
 
         req = urllib.request.Request(url, data=query_params)
@@ -386,8 +384,6 @@ class SmartFanApp(App):
         self.hour = results.get('hoursValue')
         self.ten = results.get('tenMinutesValue')
         self.min = results.get('minutesValue')
-        if results.get('fanState') != self.fan_state:
-            self.fan_power()
         self.update_labels()
             
 

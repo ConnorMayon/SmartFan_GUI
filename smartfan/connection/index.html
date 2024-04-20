@@ -68,7 +68,7 @@
     <div class="button-group">
         <button onclick="saveTime()">Save Time</button>
         <button onclick="switchPage()">Switch Page</button>
-        <button class="fan-state" id="fanState" onclick="fanPower()">Fan OFF</button>
+        <button onclick="fanPower()">Fan ON/OFF</button>
     </div>
 
     <script>
@@ -159,13 +159,8 @@
         }
 
         function fanPower() {
-            if (document.getElementById('fanState').innerText == "Fan ON")
-                document.getElementById('fanState').innerText == "Fan OFF";
-            else 
-                document.getElementById('fanState').innerText == "Fan ON";
-            updateValues();
+            
         }
-
         //gets kivy data from web server
         function fetchData() {
             fetch('/log')
@@ -186,7 +181,9 @@
                 let tenVal = data.tenVal;
                 let minVal = data.minVal;
                 let latestSend = data.latestSend;
-                let fanState = data.fanState;
+
+                console.log(minVal)
+                console.log(latestSend)
 
                 if (latestSend) {
                     return;
@@ -211,11 +208,6 @@
                 if (minVal !== undefined) {
                     document.getElementById('minutesValue').innerText = minVal;
                 }
-                
-                if (fanState !== undefined) {
-                    if (fanState) document.getElementById('fanState').innerText = 'Fan ON';
-                    else document.getElementById('fanState').innerText = 'Fan OFF';
-                }
             }
         }
 
@@ -227,7 +219,6 @@
             var hoursValue = parseInt(document.getElementById('hoursValue').innerText);
             var tenMinutesValue = parseInt(document.getElementById('tenMinutesValue').innerText);
             var minutesValue = parseInt(document.getElementById('minutesValue').innerText);
-            var fanState = document.getElementById('fanState').innerText == "Fan ON"
 
         fetch('/update_values', {
             method: 'POST',
@@ -239,8 +230,7 @@
                 maxTempValue: maxTempValue,
                 hoursValue: hoursValue,
                 tenMinutesValue: tenMinutesValue,
-                minutesValue: minutesValue,
-                fanState: fanState
+                minutesValue: minutesValue
             }),
         })
         .then(response => {
