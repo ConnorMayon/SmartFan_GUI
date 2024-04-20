@@ -43,7 +43,7 @@ class SmartFanApp(App):
         self.hour = 5
         self.ten = 0
         self.min = 0
-        self.web_is_pressed = "true"
+        self.web_is_pressed = True
         self.cd_timer = 1
         self.sched_list = []
         self.sched_label_list = []
@@ -333,7 +333,8 @@ class SmartFanApp(App):
         'max_temp': self.max_temp,
         'hour': self.hour,
         'ten': self.ten,
-        'minute': self.min
+        'minute': self.min,
+        'web_is_pressed': self.web_is_pressed
         }).encode('utf-8')
 
         req = urllib.request.Request(url, data=query_params)

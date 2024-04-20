@@ -5,20 +5,6 @@ import urllib.request
 import json
 import os
 
-class CustomHandlerData(BaseHTTPRequestHandler):
-    kivyData = {}
-    #variables that are updated and sent in POST so web server can send to KIVY
-    temperatures = {
-        'minTempValue': 65,
-        'maxTempValue': 85
-    }
-    time_values = {
-        'hoursValue': 5,
-        'tenMinutesValue': 0,
-        'minutesValue': 0,
-        'latestSend': False
-    }
-
 class CustomHandler(BaseHTTPRequestHandler):
     kivyData = {}
     #variables that are updated and sent in POST so web server can send to KIVY
@@ -84,7 +70,8 @@ class CustomHandler(BaseHTTPRequestHandler):
             hourVal=parsed_data.get('hour')[0]
             tenVal=parsed_data.get('ten')[0]
             minVal=parsed_data.get('minute')[0]
-            CustomHandler.kivyData=({"minTemp": minTemp, "maxTemp": maxTemp, "hourVal": hourVal, "tenVal": tenVal, "minVal": minVal})
+            webIsPressed=parsed_data.get('web_is_pressed')[0]
+            CustomHandler.kivyData=({"minTemp": minTemp, "maxTemp": maxTemp, "hourVal": hourVal, "tenVal": tenVal, "minVal": minVal, 'webIsPressed': webIsPressed})
             print(CustomHandler.kivyData)
             self._set_headers()
             #self.wfile.write(b'Data received successfully')
