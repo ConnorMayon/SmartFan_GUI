@@ -203,7 +203,7 @@ class SmartFanApp(App):
         if instance != None:
             self.user_pressed = True
     
-    def get_prediction(self):
+    def get_prediction(self, instance):
         while True:
             pred_result = self.prediction.predict()
             if self.cd_timer != 0:
@@ -351,7 +351,7 @@ class SmartFanApp(App):
         with urllib.request.urlopen(req) as response:
             response = response.read().decode('utf-8')
             
-    def update_acc_weather(self):
+    def update_acc_weather(self, instance):
         acctemp_array = self.prediction.get_accuweather_temps
         self.acc_temp = self.acctemp_array[0]
         if self.acc_temp != None:
@@ -369,13 +369,13 @@ class SmartFanApp(App):
         if self.min_label:
             self.min_label.text = str(self.min)
                         
-    def update_inside_temp(self):
+    def update_inside_temp(self, instance):
         asyncio.run(self.in_climate.sensorClient())
         self.in_temp  = self.in_climate.getTempF()
         if self.in_label:
             self.in_label.text = str(self.in_temp)
             
-    def update_outside_temp(self):
+    def update_outside_temp(self, instance):
         asyncio.run(self.out_climate.sensorClient())
         self.out_temp = self.out_climate.getTempF()
         if self.out_label:
