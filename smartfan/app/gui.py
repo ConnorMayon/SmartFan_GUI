@@ -64,11 +64,11 @@ class SmartFanApp(App):
         #self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #self.server_socket.connect((HOST, PORT))
 
-        Clock.schedule_once(self.make_request, 0)
+        #Clock.schedule_once(self.make_request, 0)
         #Clock.schedule_once(self.update_acc_weather, 0)
 
         #repeated every 10 minutes
-        Clock.schedule_interval(self.make_request, 1)
+        #Clock.schedule_interval(self.make_request, 1)
         #Clock.schedule_interval(self.update_acc_weather, 3600)
 
         layout = FloatLayout()
