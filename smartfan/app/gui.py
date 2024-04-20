@@ -189,7 +189,7 @@ class SmartFanApp(App):
     
     def fan_power(self, instance):
         output = bytes("power", 'utf-8')
-        #self.server_socket.sendall(output)
+        self.server_socket.sendall(output)
         self.fan_state = not self.fan_state
         if instance != None:
             self.user_pressed = True
