@@ -16,19 +16,19 @@ def main():
         s.bind((HOST, PORT))
         s.listen(1)
         conn, addr = s.accept()
-        with conn:
-            print('Connected by', addr)
-            while True:
-                data = conn.recv(1024)
-                if data == b'power':
-                    if fan_state:
-                        fan_state = False
-                        GPIO.output(pin, GPIO.LOW)
-                    else:
-                        fan_state = True
-                        GPIO.output(pin, GPIO.HIGH)
-                else:
+        print('Connected by', addr)
+        while True:
+            data = conn.recv(1024)
+            if data == b'power':
+                if fan_state:
+                    fan_state = False
                     GPIO.output(pin, GPIO.LOW)
+                else:
+                    fan_state = True
+                    GPIO.output(pin, GPIO.HIGH)
+            if not data:
+                conn, addr = s.accept()
+                print('Connected by', addr)
 
 
 if __name__ == "__main__":

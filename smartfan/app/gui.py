@@ -1,16 +1,12 @@
 from kivy.app import App
 from kivy.config import Config
 from kivy.uix.button import Button
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.core.window import Window
 from kivy.network.urlrequest import UrlRequest
 from kivy.uix.floatlayout import FloatLayout
-from kivy.clock import Clock
 from smartfan.data.local_weather import Climate
 from smartfan.prediction.prediction import Prediction
-from smartfan.data.online_weather import Forecast
 from argparse import _SubParsersAction
 from threading import Thread
 import urllib.parse
@@ -63,21 +59,14 @@ class SmartFanApp(App):
         self.fan_state = False
         self.user_pressed = False
 
-        # # Conn
+        # Connect to fan
         HOST = '192.168.1.161'    # The remote host
         #HOST = '10.3.62.245'
         PORT = 50007
-        #PORT = 8000            # The same port as used by the server
-        #self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #self.server_socket.connect((HOST, PORT))
+        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.connect((HOST, PORT))
 
-        #Clock.schedule_once(self.make_request, 0)
-        #Clock.schedule_once(self.update_acc_weather, 0)
-
-        #repeated every 10 minutes
-        #Clock.schedule_interval(self.make_request, 1)
-        #Clock.schedule_interval(self.update_acc_weather, 3600)
-
+        # GUI layout
         layout = FloatLayout()
 
         title_label = Label(text="Preferred Temperature Range", size_hint=(None, None), pos=(0, 425), color=[0, 0, 0, 1], size=(305, 40))
@@ -186,6 +175,7 @@ class SmartFanApp(App):
         alg_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(620, 65), size_hint=(None, None), size=(70, 60), on_press=self.on_cd_timer_dec_press)
         layout.add_widget(alg_dec_button)
         
+        # Perform background tasks
         Thread(target=self.update_inside_temp).start()
         Thread(target=self.update_outside_temp).start()
         if self.online:
