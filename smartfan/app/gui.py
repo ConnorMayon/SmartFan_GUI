@@ -31,6 +31,7 @@ def define_argparser(command_parser: _SubParsersAction):
 
     off.set_defaults(handler=lambda args: run_offline())
 
+
 class SmartFanApp(App):
     Window.clearcolor = (1, 1, 1, 1)
     def __init__(self, online, **kwargs):
@@ -47,8 +48,8 @@ class SmartFanApp(App):
         self.hour = 5
         self.ten = 0
         self.min = 0
-        self.web_is_pressed = True
-        self.cd_timer = 1
+        self.web_is_pressed=False
+        self.cd_timer=1
         self.sched_list = []
         self.sched_label_list = []
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
@@ -179,8 +180,7 @@ class SmartFanApp(App):
         Thread(target=self.make_request).start()
 
         return layout
-    
-    
+
     def fan_power(self, instance):
         output = bytes("power", 'utf-8')
         self.server_socket.sendall(output)
