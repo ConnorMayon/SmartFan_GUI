@@ -157,12 +157,6 @@ class SmartFanApp(App):
 
         self.out_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(485, 125), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.out_label)
-        
-        self.res = Label(color=[0, 0, 0, 1], text="Res", pos=(385, 5), size_hint=(None, None), size=(70, 60)) #DEBUG
-        layout.add_widget(self.res)
-        
-        self.web_press = Label(color=[0, 0, 0, 1], text=str(self.web_is_pressed), pos=(485, 75), size_hint=(None, None), size=(70, 60)) #DEBUG
-        layout.add_widget(self.web_press)
 
         self.alg_label = Label(color=[0, 0, 0, 1], text="Algorithm Timeout", pos=(620, 235), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.alg_label)
@@ -303,7 +297,6 @@ class SmartFanApp(App):
         print("Request failed:", error)
         
     def on_request_success(self, request, result):
-        self.res.text = str(result) #DEBUG
         print("Received data:", result)
         self.web_is_pressed = result.get('latestSend')
         if self.web_is_pressed:
@@ -381,7 +374,6 @@ class SmartFanApp(App):
             time.sleep(1)
             
     def web_update_vals(self, results):
-        self.web_press.text = str(self.web_is_pressed) #DEBUG
         self.min_temp = results.get('minTempValue')
         self.max_temp = results.get('maxTempValue')
         self.hour = results.get('hoursValue')
