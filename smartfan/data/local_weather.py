@@ -29,9 +29,9 @@ class TBAdvMinMax(TBAdvertisingMessage):
     def __init__(self, id, bvalue):
         TBAdvertisingMessage.__init__(self, MSG_ADVERTISE_MINMAX, id, bvalue)
         
-        self.max = tb_decode_temperature(bvalue[8:10])
+        self.max = tb_decode(bvalue[8:10])
         self.max_t = int.from_bytes(bvalue[10:14],byteorder='little')
-        self.min = tb_decode_temperature(bvalue[14:16])
+        self.min = tb_decode(bvalue[14:16])
         self.min_t = int.from_bytes(bvalue[16:20],byteorder='little')
 
 class TBAdvData(TBAdvertisingMessage):
@@ -40,19 +40,13 @@ class TBAdvData(TBAdvertisingMessage):
 
         self.btr = int.from_bytes(bvalue[8:10],byteorder='little')
         self.btr = self.btr*100/3400
-        self.tmp = tb_decode_temperature(bvalue[10:12])
-        self.hum = tb_decode_humidity(bvalue[12:14])
+        self.tmp = tb_decode(bvalue[10:12])
+        self.hum = tb_decode(bvalue[12:14])
         self.upt = int.from_bytes(bvalue[14:18],byteorder='little')
 
-def tb_decode_humidity(b:bytes) -> float:
+def tb_decode(b:bytes) -> float:
     result = int.from_bytes(b, byteorder='little')/16.0
-    if result>4000:
-        result -= 4096
-    return result
-
-def tb_decode_temperature(b:bytes) -> float:
-    result = int.from_bytes(b, byteorder='little')/16.0
-    if result>4000:
+    if result > 4000:
         result -= 4096
     return result
 

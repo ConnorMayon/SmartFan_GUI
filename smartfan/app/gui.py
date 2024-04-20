@@ -6,7 +6,7 @@ from kivy.uix.label import Label
 from kivy.core.window import Window
 from kivy.network.urlrequest import UrlRequest
 from smartfan.data.local_weather import Climate
-from smartfan.app.prediction import Prediction
+from smartfan.app.prediction import predict
 from smartfan.data.online_weather import Forecast
 from argparse import _SubParsersAction
 from threading import Thread
@@ -78,10 +78,8 @@ class SmartFanApp(App):
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
         if self.online:
             self.forecast = Forecast()
-            self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, self.forecast)
             self.acctemp_array = self.forecast.getTemperatureFahrenheit()
         else:
-            self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate)
             self.acctemp_array = [32, 30, 29, 28, 30, 31, 32, 29, 33, 25, 31, 33]
         #self.acctemp_array = self.forecast.getTemperatureFahrenheit()
         self.acc_temp = self.acctemp_array[0]
@@ -251,7 +249,10 @@ class SmartFanApp(App):
         self.get_forecast()
 
     def get_prediction(self):
-        pred_result = self.prediction.predict()
+        if self.online:
+            pred_result = predict(self.min_temp, self.max_temp, self.in_temp, self.out_temp)
+        else:
+            pred_result = predict(self.min_temp, self.max_temp, self.in_temp, self.out_temp, self.acctemp_array)
         if pred_result and not self.fan_state:
             self.fan_power()
         if not pred_result and self.fan_state:
@@ -286,27 +287,23 @@ class SmartFanApp(App):
 
     def on_min_temp_dec_press(self, instance):
         self.min_temp -= 1
-        self.prediction.update_range_min(self.min_temp)
         self.update_temp_labels()
         self.send_message()
 
     def on_min_temp_inc_press(self, instance):
         if self.min_temp < self.max_temp:
             self.min_temp += 1
-            self.prediction.update_range_min(self.min_temp)
             self.update_temp_labels()
             self.send_message()
 
     def on_max_temp_dec_press(self, instance):
         if self.min_temp < self.max_temp:
             self.max_temp -= 1
-            self.prediction.update_range_max(self.max_temp)
             self.update_temp_labels()
             self.send_message()
 
     def on_max_temp_inc_press(self, instance):
         self.max_temp += 1
-        self.prediction.update_range_max(self.max_temp)
         self.update_temp_labels()
         self.send_message()
 
@@ -401,30 +398,6 @@ class SmartFanApp(App):
         # Send the request
         with urllib.request.urlopen(req) as response:
             response = response.read().decode('utf-8')
-
-
-    def get_prediction(self):
-        fan_state = False
-        while True:
-            if self.prediction.predict() and not fan_state:
-                fan_state = True
-                self.fan_power()
-            if not self.prediction.predict() and fan_state:
-                fan_state = False
-                self.fan_power()
-            time.sleep(540)
-                        
-            
-    def get_prediction(self):
-        fan_state = False
-        while True:
-            if self.prediction.predict() and not fan_state:
-                fan_state = True
-                self.fan_power()
-            if not self.prediction.predict() and fan_state:
-                fan_state = False
-                self.fan_power()
-            time.sleep(540)
                         
     def update_inside_temp(self):
         while True:
