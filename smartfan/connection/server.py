@@ -5,22 +5,9 @@ import urllib.request
 import json
 import os
 
-class CustomHandlerData(BaseHTTPRequestHandler):
-    kivyData = {}
-    #variables that are updated and sent in POST so web server can send to KIVY
-    temperatures = {
-        'minTempValue': 65,
-        'maxTempValue': 85
-    }
-    time_values = {
-        'hoursValue': 5,
-        'tenMinutesValue': 0,
-        'minutesValue': 0,
-        'latestSend': False
-    }
 
 class CustomHandler(BaseHTTPRequestHandler):
-    kivyData = {}
+    kivyData = {"minTemp": 65, "maxTemp": 85, "hourVal": 5, "tenVal": 0, "minVal": 0, 'latestSend': False}
     #variables that are updated and sent in POST so web server can send to KIVY
     temperatures = {
         'minTempValue': 65,
