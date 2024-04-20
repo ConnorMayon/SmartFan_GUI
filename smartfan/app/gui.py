@@ -1,46 +1,50 @@
-
 from kivy.app import App
 from kivy.config import Config
 from kivy.uix.button import Button
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.core.window import Window
 from kivy.network.urlrequest import UrlRequest
 from kivy.uix.floatlayout import FloatLayout
-from kivy.clock import Clock
 from smartfan.data.local_weather import Climate
-from smartfan.data.online_weather import Forecast
 from smartfan.prediction.prediction import Prediction
+from argparse import _SubParsersAction
+from threading import Thread
 import urllib.parse
 import urllib.request
-import threading
 import time
 import asyncio
 import socket
-from argparse import _SubParsersAction
+import os
+
 
 def define_argparser(command_parser: _SubParsersAction):
     """
     Define `run` subcommand.
     """
-    p = command_parser.add_parser(
+    on = command_parser.add_parser(
         'run', help='run smartfan app')
 
-    p.set_defaults(handler=lambda args: run())
+    on.set_defaults(handler=lambda args: run())
+    
+    off = command_parser.add_parser(
+        'run_offline', help='run the smartfan app offline')
+
+    off.set_defaults(handler=lambda args: run_offline())
+
 
 class SmartFanApp(App):
     Window.clearcolor = (1, 1, 1, 1)
-    def __init__(self, **kwargs):
+    def __init__(self, online, **kwargs):
         super().__init__(**kwargs)
         self.min_temp_label = None
         self.max_temp_label = None
+        self.online = online
 
     def build(self):
         self.page = 0
         self.display_on = True
-        self.min_temp = 65
-        self.max_temp = 85
+        self.min_temp = 64
+        self.max_temp = 84
         self.hour = 5
         self.ten = 0
         self.min = 0
@@ -50,29 +54,21 @@ class SmartFanApp(App):
         self.sched_label_list = []
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
-        self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climateself.forecast)
+        self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, self.online)
         self.acc_temp = 0
         self.in_temp = 0
         self.out_temp = 0
         self.fan_state = False
         self.user_pressed = False
 
-
-        # # Conn
+        # Connect to fan
         HOST = '192.168.1.161'    # The remote host
-        #HOST = '10.3.62.253'
+        #HOST = '10.3.62.245'
         PORT = 50007
-        #PORT = 8000            # The same port as used by the server
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.connect((HOST, PORT))
 
-        Clock.schedule_once(self.make_request, 0)
-        #Clock.schedule_once(self.update_acc_weather, 0)
-
-        #repeated every 10 minutes
-        Clock.schedule_interval(self.make_request, 1)
-        #Clock.schedule_interval(self.update_acc_weather, 3600)
-
+        # GUI layout
         layout = FloatLayout()
 
         title_label = Label(text="Preferred Temperature Range", size_hint=(None, None), pos=(0, 425), color=[0, 0, 0, 1], size=(305, 40))
@@ -153,6 +149,8 @@ class SmartFanApp(App):
         layout.add_widget(out_title)
 
         self.acc_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(285, 125), size_hint=(None, None), size=(70, 60))
+        if not self.online:
+            self.acc_label.text = "Offline"
         layout.add_widget(self.acc_label)
 
         self.in_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(385, 125), size_hint=(None, None), size=(70, 60))
@@ -173,14 +171,16 @@ class SmartFanApp(App):
         alg_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(620, 65), size_hint=(None, None), size=(70, 60), on_press=self.on_cd_timer_dec_press)
         layout.add_widget(alg_dec_button)
         
-        #acc_thread = threading.Thread(target=self.update_acc_weather).start()
-        it_thread = threading.Thread(target=self.update_inside_temp).start()
-        ot_thread = threading.Thread(target=self.update_outside_temp).start()
-        pred_thread = threading.Thread(target=self.get_prediction).start()
-        #update_thread = threading.Thread(target=self.make_request).start()
+        # Perform background tasks
+        Thread(target=self.update_inside_temp).start()
+        Thread(target=self.update_outside_temp).start()
+        if self.online:
+            Thread(target=self.update_acc_weather).start()
+        Thread(target=self.get_prediction).start()
+        Thread(target=self.make_request).start()
 
         return layout
-    
+
     def fan_power(self, instance):
         output = bytes("power", 'utf-8')
         self.server_socket.sendall(output)
@@ -202,22 +202,16 @@ class SmartFanApp(App):
                     self.user_pressed = False
                 else:
                     time.sleep(1)
-    
-    def make_request(self, instance):
+
+    def make_request(self):
         # Make a GET request
-        url = 'http://10.3.62.245:8000/data'
-        #url = 'http://192.168.1.18:8000/data'
+        #url = 'http://10.3.62.245:8000/data'
+        url = 'http://192.168.1.18:8000/data'
 
-        self.request = UrlRequest(url, on_success=self.on_request_success, on_failure=self.on_request_failure)
-
-    def on_request_success(self, request, result):
-        print("Received data:", result)
-        self.web_update_temp(result)
-        self.web_update_time(result)
-
-    def on_request_failure(self, request, error):
-        print("Request failed:", error)
-
+        while True:
+            self.request = UrlRequest(url, on_success=self.on_request_success, on_failure=self.on_request_failure)
+            time.sleep(1)
+        
     def on_cd_timer_dec_press(self, instance):
         self.cd_timer -= 1
         if self.cd_timer == 0:
@@ -234,70 +228,79 @@ class SmartFanApp(App):
     def on_min_temp_dec_press(self, instance):
         self.min_temp -= 1
         #self.prediction.update_range_min(self.min_temp)
-        self.update_temp_labels()
+        self.update_labels()
         self.send_message()
 
     def on_min_temp_inc_press(self, instance):
         if self.min_temp < self.max_temp:
             self.min_temp += 1
             #self.prediction.update_range_min(self.min_temp)
-            self.update_temp_labels()
+            self.update_labels()
             self.send_message()
 
     def on_max_temp_dec_press(self, instance):
         if self.min_temp < self.max_temp:
             self.max_temp -= 1
             #self.prediction.update_range_max(self.max_temp)
-            self.update_temp_labels()
+            self.update_labels()
             self.send_message()
 
     def on_max_temp_inc_press(self, instance):
         self.max_temp += 1
         #self.prediction.update_range_max(self.max_temp)
-        self.update_temp_labels()
+        self.update_labels()
         self.send_message()
         
     def on_hour_dec_press(self, instance):
         self.hour -= 1
         if self.hour == -1:
             self.hour = 23
-        self.update_time_labels()
+        self.update_labels()
         self.send_message()
 
     def on_hour_inc_press(self, instance):
         self.hour += 1
         if self.hour == 24:
             self.hour = 0
-        self.update_time_labels()
+        self.update_labels()
         self.send_message()
 
     def on_ten_dec_press(self, instance):
         self.ten -= 1
         if self.ten == -1:
             self.ten = 5
-        self.update_time_labels()
+        self.update_labels()
         self.send_message()
 
     def on_ten_inc_press(self, instance):
         self.ten += 1
         if self.ten == 6:
             self.ten = 0
-        self.update_time_labels()
+        self.update_labels()
         self.send_message()
 
     def on_min_dec_press(self, instance):
         self.min -= 1
         if self.min == -1:
             self.min = 9
-        self.update_time_labels()
+        self.update_labels()
         self.send_message()
 
     def on_min_inc_press(self, instance):
         self.min += 1
         if self.min == 10:
             self.min = 0
-        self.update_time_labels()
+        self.update_labels()
         self.send_message()
+        
+    def on_request_failure(self, request, error):
+        print("Request failed:", error)
+        
+    def on_request_success(self, request, result):
+        print("Received data:", result)
+        self.web_is_pressed = result.get('latestSend')
+        if self.web_is_pressed:
+            self.web_update_vals(result)
 
     def save_time(self, instance):
         time_value = f"{self.hour:02}:{self.ten}{self.min}"
@@ -316,7 +319,7 @@ class SmartFanApp(App):
    
     def send_message(self):
         # Base URL of the server
-        #url = 'http://10.3.62.253:8000/log'
+        #url = 'http://10.3.62.245:8000/log'
         url = 'http://192.168.1.18:8000/log'
 
         # Construct the query string
@@ -338,16 +341,15 @@ class SmartFanApp(App):
         while True:
             acctemp_array = self.prediction.get_accuweather_temps
             self.acc_temp = self.acctemp_array[0]
-            self.acc_label.text = str(round(self.acc_temp, 2))
+            if self.acc_temp != None:
+                self.acc_label.text = str(round(self.acc_temp, 2))
             time.sleep(3600)
 
-    def update_temp_labels(self):
+    def update_labels(self):
         if self.min_temp_label:
             self.min_temp_label.text = str(self.min_temp)
         if self.max_temp_label:
             self.max_temp_label.text = str(self.max_temp)
-
-    def update_time_labels(self):
         if self.hour_label:
             self.hour_label.text = str(self.hour)
         if self.ten_label:
@@ -370,24 +372,18 @@ class SmartFanApp(App):
             if self.out_label:
                 self.out_label.text = str(self.out_temp)
             time.sleep(1)
-
-    def web_update_temp(self, results):
-        self.web_is_pressed = results.get('latestResult')
-        if self.web_is_pressed == True:
-            self.min_temp = results.get('minTempValue')
-            self.max_temp = results.get('maxTempValue')
-            self.update_temp_labels()
-
-    def web_update_time(self, results):
-        self.web_is_pressed = results.get('latestResult')
-        if self.web_is_pressed == True:
-            self.hour = results.get('hoursValue')
-            self.ten = results.get('tenMinutesValue')
-            self.min = results.get('minutesValue')
-            self.update_time_labels()
+            
+    def web_update_vals(self, results):
+        self.min_temp = results.get('minTempValue')
+        self.max_temp = results.get('maxTempValue')
+        self.hour = results.get('hoursValue')
+        self.ten = results.get('tenMinutesValue')
+        self.min = results.get('minutesValue')
+        self.update_labels()
+            
 
 def run():
-    #os.popen('xset dpms 30 30 30')  # Set screen blanking to 15 seconds
+    os.popen('xset dpms 30 30 30')  # Set screen blanking to 15 seconds
     
     # Set window to full screen
     # PUT THESE BACK BEFORE MERGE
@@ -399,4 +395,14 @@ def run():
     #Config.write()
 
     
-    SmartFanApp().run()
+    SmartFanApp(True).run()
+
+def run_offline():
+    os.popen('xset dpms 30 30 30')  # Set screen blanking to 15 seconds
+
+    # Set window to full screen
+    Config.set('graphics', 'fullscreen', 'auto')
+    Config.set('graphics', 'window_state', 'maximized')
+    Config.write()
+
+    SmartFanApp(False).run()

@@ -1,12 +1,12 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
+from socketserver import ThreadingMixIn
 import urllib
 import urllib.request
 import json
 import os
 
-
 class CustomHandler(BaseHTTPRequestHandler):
-    kivyData = {}
+    kivyData = {"minTemp": 65, "maxTemp": 85, "hourVal": 5, "tenVal": 0, "minVal": 0, 'latestSend': False}
     #variables that are updated and sent in POST so web server can send to KIVY
     temperatures = {
         'minTempValue': 65,
@@ -15,9 +15,10 @@ class CustomHandler(BaseHTTPRequestHandler):
     time_values = {
         'hoursValue': 5,
         'tenMinutesValue': 0,
-        'minutesValue': 0
+        'minutesValue': 0,
+        'latestSend': False
     }
-
+    
     def _set_headers(self, content_type='text/plain', response_type=200):
         self.send_response(response_type)
         self.send_header('Content-type', content_type)
@@ -36,13 +37,7 @@ class CustomHandler(BaseHTTPRequestHandler):
             self.end_headers()
             with open(os.path.join(os.getcwd(), 'styles.css'), 'rb') as file:
                 self.wfile.write(file.read())
-        #not working down to next comment
-        #something like this needed for switch page on web app
-        elif self.path == '/switch':
-            self.send_response(301)
-            self.send_header('Location', 'schedule.html')
-            self.end_headers() 
-            #end   
+                
         #send kivy data to web app
         elif self.path == '/log':
             self._set_headers(content_type='application/json')
@@ -78,7 +73,9 @@ class CustomHandler(BaseHTTPRequestHandler):
             CustomHandler.kivyData=({"minTemp": minTemp, "maxTemp": maxTemp, "hourVal": hourVal, "tenVal": tenVal, "minVal": minVal})
             print(CustomHandler.kivyData)
             self._set_headers()
-            self.wfile.write(b'Data received successfully')
+            #self.wfile.write(b'Data received successfully')
+            CustomHandler.time_values['latestSend'] = False
+            CustomHandler.kivyData['latestSend'] = False
         else:
             self.send_error(404, 'File Not Found: %s' % self.path)
 
@@ -92,17 +89,19 @@ class CustomHandler(BaseHTTPRequestHandler):
             CustomHandler.time_values['hoursValue'] = parsed_data['hoursValue']
             CustomHandler.time_values['tenMinutesValue'] = parsed_data['tenMinutesValue']
             CustomHandler.time_values['minutesValue'] = parsed_data['minutesValue']
+            self._set_headers()
+            #self.wfile.write(b'Values updated successfully')
+            CustomHandler.time_values['latestSend'] = True
+            CustomHandler.kivyData['latestSend'] = True
             print(CustomHandler.temperatures)
             print(CustomHandler.time_values)
-            self._set_headers()
-            self.wfile.write(b'Values updated successfully')
         else:
             self.send_error(404, 'File Not Found: %s' % self.path)
 
 if __name__ == "__main__":
     PORT = 8000
     server_address = ('', PORT)
-    httpd = HTTPServer(server_address, CustomHandler)
+    httpd = ThreadingHTTPServer(server_address, CustomHandler)
     print('Server running at port', PORT)
     try:
         httpd.serve_forever()
