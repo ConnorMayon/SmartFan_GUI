@@ -61,8 +61,8 @@ class SmartFanApp(App):
         #HOST = '10.3.62.245'
         PORT = 50007
         #PORT = 8000            # The same port as used by the server
-        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_socket.connect((HOST, PORT))
+        #self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #self.server_socket.connect((HOST, PORT))
 
         Clock.schedule_once(self.make_request, 0)
         #Clock.schedule_once(self.update_acc_weather, 0)
@@ -188,7 +188,7 @@ class SmartFanApp(App):
     
     def fan_power(self, instance):
         output = bytes("power", 'utf-8')
-        self.server_socket.sendall(output)
+        #self.server_socket.sendall(output)
         self.fan_state = not self.fan_state
         if instance != None:
             self.user_pressed = True
