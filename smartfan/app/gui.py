@@ -191,7 +191,7 @@ class SmartFanApp(App):
         if self.online:
             Thread(target=self.update_acc_weather).start()
         Thread(target=self.get_prediction).start()
-        Clock.schedule_interval(self.make_request, 1)
+        Thread(target=self.make_request).start()
 
         return layout
     
@@ -218,12 +218,14 @@ class SmartFanApp(App):
                 else:
                     time.sleep(1)
 
-    def make_request(self, instance):
+    def make_request(self):
         # Make a GET request
         #url = 'http://10.3.62.245:8000/data'
         url = 'http://192.168.1.18:8000/data'
 
-        self.request = UrlRequest(url, on_success=self.on_request_success, on_failure=self.on_request_failure)
+        while True:
+            self.request = UrlRequest(url, on_success=self.on_request_success, on_failure=self.on_request_failure)
+            time.sleep(1)
         
     def on_cd_timer_dec_press(self, instance):
         self.cd_timer -= 1
