@@ -9,31 +9,38 @@ from kivy.network.urlrequest import UrlRequest
 from kivy.uix.floatlayout import FloatLayout
 from kivy.clock import Clock
 from smartfan.data.local_weather import Climate
-from smartfan.data.online_weather import Forecast
 from smartfan.prediction.prediction import Prediction
+from smartfan.data.online_weather import Forecast
+from argparse import _SubParsersAction
+from threading import Thread
 import urllib.parse
 import urllib.request
-import threading
 import time
 import asyncio
 import socket
-from argparse import _SubParsersAction
+
 
 def define_argparser(command_parser: _SubParsersAction):
     """
     Define `run` subcommand.
     """
-    p = command_parser.add_parser(
+    on = command_parser.add_parser(
         'run', help='run smartfan app')
 
-    p.set_defaults(handler=lambda args: run())
+    on.set_defaults(handler=lambda args: run())
+    
+    off = command_parser.add_parser(
+        'run_offline', help='run the smartfan app offline')
+
+    off.set_defaults(handler=lambda args: run_offline())
 
 class SmartFanApp(App):
     Window.clearcolor = (1, 1, 1, 1)
-    def __init__(self, **kwargs):
+    def __init__(self, online, **kwargs):
         super().__init__(**kwargs)
         self.min_temp_label = None
         self.max_temp_label = None
+        self.online = online
 
     def build(self):
         self.page = 0
@@ -49,7 +56,7 @@ class SmartFanApp(App):
         self.sched_label_list = []
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
-        self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, False)
+        self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, self.online)
         self.acc_temp = 0
         self.in_temp = 0
         self.out_temp = 0
@@ -151,6 +158,8 @@ class SmartFanApp(App):
         layout.add_widget(out_title)
 
         self.acc_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(285, 125), size_hint=(None, None), size=(70, 60))
+        if not self.online:
+            self.acc_label.text = "Offline"
         layout.add_widget(self.acc_label)
 
         self.in_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(385, 125), size_hint=(None, None), size=(70, 60))
@@ -177,12 +186,12 @@ class SmartFanApp(App):
         alg_dec_button = Button(text='Down', background_color=[0.075, 0.71, 0.918, 1], pos=(620, 65), size_hint=(None, None), size=(70, 60), on_press=self.on_cd_timer_dec_press)
         layout.add_widget(alg_dec_button)
         
-        #acc_thread = threading.Thread(target=self.update_acc_weather).start()
-        it_thread = threading.Thread(target=self.update_inside_temp).start()
-        ot_thread = threading.Thread(target=self.update_outside_temp).start()
-        pred_thread = threading.Thread(target=self.get_prediction).start()
+        Thread(target=self.update_inside_temp).start()
+        Thread(target=self.update_outside_temp).start()
+        if self.online:
+            Thread(target=self.update_acc_weather).start()
+        Thread(target=self.get_prediction).start()
         Clock.schedule_interval(self.make_request, 1)
-        #update_thread = threading.Thread(target=self.make_request).start()
 
         return layout
     
@@ -346,7 +355,8 @@ class SmartFanApp(App):
         while True:
             acctemp_array = self.prediction.get_accuweather_temps
             self.acc_temp = self.acctemp_array[0]
-            self.acc_label.text = str(round(self.acc_temp, 2))
+            if self.acc_temp != None:
+                self.acc_label.text = str(round(self.acc_temp, 2))
             time.sleep(3600)
 
     def update_labels(self):
@@ -400,4 +410,12 @@ def run():
     #Config.write()
 
     
-    SmartFanApp().run()
+    SmartFanApp(True).run()
+
+def run_offline():
+    # Set window to full screen
+    Config.set('graphics', 'fullscreen', 'auto')
+    Config.set('graphics', 'window_state', 'maximized')
+    Config.write()
+
+    SmartFanApp(False).run()

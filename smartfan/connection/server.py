@@ -5,7 +5,6 @@ import urllib.request
 import json
 import os
 
-
 class CustomHandler(BaseHTTPRequestHandler):
     kivyData = {"minTemp": 65, "maxTemp": 85, "hourVal": 5, "tenVal": 0, "minVal": 0, 'latestSend': False}
     #variables that are updated and sent in POST so web server can send to KIVY
