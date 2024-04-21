@@ -55,7 +55,8 @@ class SmartFanApp(App):
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
         self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, self.online)
-        self.acc_temp = 0
+        self.acc_list = self.prediction.get_accuweather_temps()
+        self.acc_temp = self.acc_list[0]
         self.in_temp = 0
         self.out_temp = 0
         self.fan_state = False
@@ -148,7 +149,7 @@ class SmartFanApp(App):
         out_title = Label(color=[0, 0, 0, 1], text="Outside", pos=(485, 175), size_hint=(None, None), size=(70, 60))
         layout.add_widget(out_title)
 
-        self.acc_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(285, 125), size_hint=(None, None), size=(70, 60))
+        self.acc_label = Label(color=[0, 0, 0, 1], text=str(self.acc_temp), pos=(285, 125), size_hint=(None, None), size=(70, 60))
         if not self.online:
             self.acc_label.text = "Offline"
         layout.add_widget(self.acc_label)
