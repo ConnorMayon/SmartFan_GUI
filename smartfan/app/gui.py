@@ -227,27 +227,27 @@ class SmartFanApp(App):
 
     def on_min_temp_dec_press(self, instance):
         self.min_temp -= 1
-        #self.prediction.update_range_min(self.min_temp)
+        self.prediction.update_range_min(self.min_temp)
         self.update_labels()
         self.send_message()
 
     def on_min_temp_inc_press(self, instance):
         if self.min_temp < self.max_temp:
             self.min_temp += 1
-            #self.prediction.update_range_min(self.min_temp)
+            self.prediction.update_range_min(self.min_temp)
             self.update_labels()
             self.send_message()
 
     def on_max_temp_dec_press(self, instance):
         if self.min_temp < self.max_temp:
             self.max_temp -= 1
-            #self.prediction.update_range_max(self.max_temp)
+            self.prediction.update_range_max(self.max_temp)
             self.update_labels()
             self.send_message()
 
     def on_max_temp_inc_press(self, instance):
         self.max_temp += 1
-        #self.prediction.update_range_max(self.max_temp)
+        self.prediction.update_range_max(self.max_temp)
         self.update_labels()
         self.send_message()
         
@@ -339,7 +339,7 @@ class SmartFanApp(App):
             
     def update_acc_weather(self):
         while True:
-            acctemp_array = self.prediction.get_accuweather_temps
+            acctemp_array = self.prediction.get_accuweather_temps()
             self.acc_temp = self.acctemp_array[0]
             if self.acc_temp != None:
                 self.acc_label.text = str(round(self.acc_temp, 2))
