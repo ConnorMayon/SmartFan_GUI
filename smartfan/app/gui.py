@@ -150,9 +150,15 @@ class SmartFanApp(App):
         layout.add_widget(out_title)
 
         self.acc_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(285, 125), size_hint=(None, None), size=(70, 60))
+        self.acc_forecast_label1 = Label(color=[0, 0, 0, 1], text="Connecting", pos=(285, 75), size_hint=(None, None), size=(70, 60))
+        self.acc_forecast_label2 = Label(color=[0, 0, 0, 1], text="Connecting", pos=(285, 25), size_hint=(None, None), size=(70, 60))
         if not self.online:
             self.acc_label.text = "Offline"
+            self.acc_forecast_label1.text = "Offline"
+            self.acc_forecast_label2.text = "Offline"
         layout.add_widget(self.acc_label)
+        layout.add_widget(self.acc_forecast_label1)
+        layout.add_widget(self.acc_forecast_label2)
 
         self.in_label = Label(color=[0, 0, 0, 1], text="Connecting", pos=(385, 125), size_hint=(None, None), size=(70, 60))
         layout.add_widget(self.in_label)
@@ -344,6 +350,8 @@ class SmartFanApp(App):
             self.acc_temp = self.acctemp_array[0]
             if self.acc_temp != None:
                 self.acc_label.text = str(round(self.acc_temp, 2))
+                self.acc_forecast_label1.text = str(round(self.acctemp_array[1], 2))
+                self.acc_forecast_label2.text = str(round(self.acctemp_array[2], 2))
             time.sleep(3600)
 
     def update_labels(self):
