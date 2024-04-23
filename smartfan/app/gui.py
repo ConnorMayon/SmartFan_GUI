@@ -217,7 +217,7 @@ class SmartFanApp(App):
 
         while True:
             self.request = UrlRequest(url, on_success=self.on_request_success, on_failure=self.on_request_failure)
-            time.sleep(.25)
+            time.sleep(.5)
         
     def on_cd_timer_dec_press(self, instance):
         self.cd_timer -= 1
