@@ -217,7 +217,7 @@ class SmartFanApp(App):
 
         while True:
             self.request = UrlRequest(url, on_success=self.on_request_success, on_failure=self.on_request_failure)
-            time.sleep(1)
+            time.sleep(.25)
         
     def on_cd_timer_dec_press(self, instance):
         self.cd_timer -= 1
@@ -372,7 +372,7 @@ class SmartFanApp(App):
             self.in_temp  = self.in_climate.getTempF()
             if self.in_label:
                 self.in_label.text = str(self.in_temp)
-            time.sleep(1)
+            time.sleep(.5)
             
     def update_outside_temp(self):
         while True:
@@ -380,7 +380,7 @@ class SmartFanApp(App):
             self.out_temp = self.out_climate.getTempF()
             if self.out_label:
                 self.out_label.text = str(self.out_temp)
-            time.sleep(1)
+            time.sleep(.5)
             
     def web_update_vals(self, results):
         self.min_temp = results.get('minTempValue')
