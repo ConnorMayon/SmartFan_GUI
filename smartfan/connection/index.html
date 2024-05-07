@@ -69,7 +69,6 @@
         <button onclick="saveTime()">Save Time</button>
         <button onclick="switchPage()">Switch Page</button>
         <button onclick="fanPower()">Fan ON/OFF</button>
-        <button onclick="fetchData()">Update</button>
     </div>
 
     <script>
@@ -181,6 +180,14 @@
                 let hourVal = data.hourVal;
                 let tenVal = data.tenVal;
                 let minVal = data.minVal;
+                let latestSend = data.latestSend;
+
+                console.log(minVal)
+                console.log(latestSend)
+
+                if (latestSend) {
+                    return;
+                }
 
                 if (minTemp !== undefined) {
                     document.getElementById('minTempValue').innerText = minTemp;
@@ -237,8 +244,7 @@
     }
 
     // Attempt to make fetching parallel
-    var fetch_worker = new Worker('fetch.js');
-    fetch_worker.postMessage('');
+    setInterval(fetchData, 500)
     </script>
 </body>
 
