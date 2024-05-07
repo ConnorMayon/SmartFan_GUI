@@ -6,7 +6,8 @@ from kivy.core.window import Window
 from kivy.network.urlrequest import UrlRequest
 from kivy.uix.floatlayout import FloatLayout
 from smartfan.data.local_weather import Climate
-from smartfan.prediction.prediction import Prediction
+from smartfan.app.prediction import predict
+from smartfan.data.online_weather import Forecast
 from argparse import _SubParsersAction
 from threading import Thread
 import urllib.parse
@@ -14,18 +15,17 @@ import urllib.request
 import time
 import asyncio
 import socket
-import os
 
 
 def define_argparser(command_parser: _SubParsersAction):
     """
-    Define `run` subcommand.
+    Define `run` and `run_offline` subcommands.
     """
     on = command_parser.add_parser(
-        'run', help='run smartfan app')
+        'run', help='run the smartfan app')
 
     on.set_defaults(handler=lambda args: run())
-    
+
     off = command_parser.add_parser(
         'run_offline', help='run the smartfan app offline')
 
@@ -54,10 +54,15 @@ class SmartFanApp(App):
         self.sched_label_list = []
         self.in_climate = Climate("Indoors", "44:fe:00:00:0e:d5")
         self.out_climate = Climate("Outdoors", "44:8d:00:00:00:23")
-        self.prediction = Prediction(self.min_temp, self.max_temp, self.in_climate, self.out_climate, self.online)
-        self.acctemp_array = [0] * 13
-        self.acc_temp = 0
-        self.in_temp = 0
+        if self.online:
+            self.forecast = Forecast()
+            self.acctemp_array = self.forecast.getTemperatureFahrenheit()
+        else:
+            self.acctemp_array = [32, 30, 29, 28, 30, 31, 32, 29, 33, 25, 31, 33]
+        #self.acctemp_array = self.forecast.getTemperatureFahrenheit()
+        self.acc_temp = self.acctemp_array[0]
+        self.acc_temp = 30
+        self.in_temp  = 0
         self.out_temp = 0
         self.fan_state = False
         self.user_pressed = False
@@ -194,23 +199,36 @@ class SmartFanApp(App):
         self.fan_state = not self.fan_state
         if instance != None:
             self.user_pressed = True
-    
+ 
+    def get_forecast(self):
+        time.sleep(3600)
+
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(self.forecast.accuClient())
+        loop.close()
+        self.acctemp_array = self.forecast.getTemperatureFahrenheit()
+
+        self.get_forecast()
+
     def get_prediction(self):
-        while True:
-            pred_result = self.prediction.predict()
-            if self.cd_timer != 0:
-                if pred_result and not self.fan_state:
-                    self.fan_power()
-                if not pred_result and self.fan_state:
-                    self.fan_power()
+        if self.online:
+            pred_result = predict(self.min_temp, self.max_temp, self.in_temp, self.out_temp)
+        else:
+            pred_result = predict(self.min_temp, self.max_temp, self.in_temp, self.out_temp, self.acctemp_array)
+        if pred_result and not self.fan_state:
+            self.fan_power()
+        if not pred_result and self.fan_state:
+            self.fan_power()
+            
+        time.sleep(60)
+        
+        if self.user_pressed:
+            time.sleep(self.cd_timer * 60)
+            self.user_pressed = False
 
-                if self.user_pressed:
-                    time.sleep(self.cd_timer * 60)
-                    self.user_pressed = False
-                else:
-                    time.sleep(1)
+        self.get_prediction()
 
-    def make_request(self):
+    def make_request(self, instance):
         # Make a GET request
         #url = 'http://10.3.62.245:8000/data'
         url = 'http://192.168.1.18:8000/data'
@@ -234,30 +252,31 @@ class SmartFanApp(App):
 
     def on_min_temp_dec_press(self, instance):
         self.min_temp -= 1
-        self.prediction.update_range_min(self.min_temp)
-        self.update_labels()
+        self.update_temp_labels()
         self.send_message()
 
     def on_min_temp_inc_press(self, instance):
         if self.min_temp < self.max_temp:
             self.min_temp += 1
-            self.prediction.update_range_min(self.min_temp)
-            self.update_labels()
+            self.update_temp_labels()
             self.send_message()
 
     def on_max_temp_dec_press(self, instance):
         if self.min_temp < self.max_temp:
             self.max_temp -= 1
-            self.prediction.update_range_max(self.max_temp)
-            self.update_labels()
+            self.update_temp_labels()
             self.send_message()
 
     def on_max_temp_inc_press(self, instance):
         self.max_temp += 1
-        self.prediction.update_range_max(self.max_temp)
-        self.update_labels()
+        self.update_temp_labels()
         self.send_message()
-        
+
+    def on_success(self, request, result):
+        print("Received data:", result)
+        self.web_update_temp(result)
+        self.web_update_time(result)
+    
     def on_hour_dec_press(self, instance):
         self.hour -= 1
         if self.hour == -1:
@@ -390,6 +409,32 @@ class SmartFanApp(App):
         self.min = results.get('minutesValue')
         self.update_labels()
             
+    def update_temp_labels(self):
+        if self.min_temp_label:
+            self.min_temp_label.text = str(self.min_temp)
+        if self.max_temp_label:
+            self.max_temp_label.text = str(self.max_temp)
+
+    def update_time_labels(self):
+        if self.hour_label:
+            self.hour_label.text = str(self.hour)
+        if self.ten_label:
+            self.ten_label.text = str(self.ten)
+        if self.min_label:
+            self.min_label.text = str(self.min)
+            
+    def web_update_temp(self, results):
+        self.min_temp = results.get('minTempValue')
+        self.max_temp = results.get('maxTempValue')
+        self.update_temp_labels()
+
+    def web_update_time(self, results):
+        self.hour = results.get('hoursValue')
+        self.ten = results.get('tenMinutesValue')
+        self.min = results.get('minutesValue')
+        self.update_time_labels()
+            
+
 
 def run():
     os.popen('xset dpms 30 30 30')  # Set screen blanking to 15 seconds

@@ -1,4 +1,5 @@
-kivy
-bleak
 accuweather
+bleak
+kivy
+pytest
 RPi.GPIO
